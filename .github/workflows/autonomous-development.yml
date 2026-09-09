@@ -22,6 +22,7 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write # claude-code-action requests an OIDC token
 
 jobs:
   develop:
@@ -56,6 +57,9 @@ jobs:
           # OpenRouter key stored as a repo secret. Claude Code talks to
           # OpenRouter's Anthropic-compatible endpoint (see env below).
           anthropic_api_key: ${{ secrets.OPENROUTER_API_KEY }}
+          # Pass the token explicitly so the action skips the OIDC/GitHub-App
+          # exchange (we are not using the Claude GitHub App here).
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           prompt: |
             You are an autonomous Flutter engineer working on a Todo app.
 
