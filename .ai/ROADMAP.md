@@ -7,7 +7,7 @@ level. Tick a box when the whole feature is done.
 ## Phase 1 — Foundation (Week 1)
 
 - [x] Flutter project scaffold + folder structure
-- [ ] Dependencies (sqflite, path, provider)
+- [x] Dependencies (sqflite, path, provider)
 - [ ] SQLite `DatabaseHelper` (open/create DB)
 - [ ] `Todo` model
 - [ ] Todo DAO: create

@@ -34,3 +34,5 @@ flutter run
 - Day 01: project scaffold — created the `data/`, `models/`, `providers/`,
   `screens/`, `widgets/`, `utils/` folder structure with placeholder files;
   app runs and shows an empty Todo home.
+- Day 02: added dependencies — `sqflite`, `path`, `provider`
+  (`sqflite_common_ffi` for tests) with a wiring smoke test.

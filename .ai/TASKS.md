@@ -14,7 +14,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
 - [x] **Day 01 — Project scaffold.** Initialize the Flutter project. Create the
   folder structure from `AGENTS.md` (`data/`, `models/`, `providers/`, `screens/`,
   `widgets/`, `utils/`) with placeholder files. App runs and shows an empty home.
-- [ ] **Day 02 — Dependencies.** Add `sqflite`, `path`, `provider` to
+- [x] **Day 02 — Dependencies.** Add `sqflite`, `path`, `provider` to
   `pubspec.yaml`. Run `flutter pub get`. No feature yet — just wiring + a smoke test.
 - [ ] **Day 03 — DatabaseHelper.** Create a singleton `DatabaseHelper` in `data/`
   that opens/creates the SQLite DB (schema version 1, no tables yet). Unit test it
