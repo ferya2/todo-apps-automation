@@ -22,7 +22,6 @@ concurrency:
 permissions:
   contents: write
   pull-requests: write
-  id-token: write # claude-code-action requests an OIDC token
 
 jobs:
   develop:
@@ -51,65 +50,69 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
       - name: Run AI Developer
-        uses: anthropics/claude-code-action@v1
-        with:
-          # OpenRouter key stored as a repo secret. Claude Code talks to
-          # OpenRouter's Anthropic-compatible endpoint (see env below).
-          anthropic_api_key: ${{ secrets.OPENROUTER_API_KEY }}
-          # Pass the token explicitly so the action skips the OIDC/GitHub-App
-          # exchange (we are not using the Claude GitHub App here).
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          prompt: |
-            You are an autonomous Flutter engineer working on a Todo app.
-
-            Your goal: make ONE meaningful, small, incremental change and open a PR.
-
-            Steps:
-            1. Read AGENTS.md first.
-            2. Read .ai/ARCHITECTURE.md and .ai/DEVELOPMENT.md.
-            3. Read .ai/TASKS.md and pick the FIRST unchecked "Day NN" task.
-            4. Implement ONLY that task. Follow the existing architecture.
-               Do not implement other days. Do not refactor unrelated code.
-            5. Add or update tests for the logic you wrote.
-            6. Run validation: `dart format .`, then `flutter analyze`,
-               then `flutter test`. All three must pass.
-            7. If validation fails, fix it. If it cannot pass cleanly, make NO
-               changes and stop.
-            8. When it passes, tick that Day's checkbox in .ai/TASKS.md (and the
-               matching item in .ai/ROADMAP.md if the feature is complete).
-            9. Update README.md: keep a short project description at the top, and
-               under a "## Progress" section add ONE concise bullet for the task you
-               just finished (e.g. "- Day 05: SQLite insert for todos"). Keep it
-               brief — do not rewrite the whole file.
-            10. Create a branch named `feat/ai/<YYYY-MM-DD>-<short-task-slug>`.
-            11. Commit with a Conventional Commit message, e.g.
-                `feat(todo): add SQLite insert for todo items`.
-            12. Push the branch and open a Pull Request against `main` using the
-                `gh` CLI. The PR body must state which Day task was done and how
-                it was validated.
-
-            Hard rules:
-            - Do exactly ONE task. Prefer the smallest correct implementation.
-            - Never push to main. Never modify secrets or CI credentials.
-            - Do not add dependencies unless the task requires it.
-            - Do NOT add any AI attribution: no "Co-Authored-By", no "Generated
-              with Claude", no bot signatures, in commits OR in the PR body.
-          # Give the agent the tools it needs: run Flutter/git/gh and edit files.
-          claude_args: >-
-            --allowedTools "Bash,Edit,Write,Read,Glob,Grep"
-            --max-turns 40
         env:
-          # --- OpenRouter wiring ---
-          # Claude Code appends /v1/messages to this base URL, so the final call
-          # is https://openrouter.ai/api/v1/messages (OpenRouter's Anthropic API).
+          # --- OpenRouter wiring (per OpenRouter's official Claude Code docs) ---
+          # Base URL: Claude Code appends /v1/messages -> openrouter.ai/api/v1/messages
           ANTHROPIC_BASE_URL: https://openrouter.ai/api
-          # Model slugs are OpenRouter slugs. Set repo *variables* to change them
-          # without editing this file. Defaults use free models.
+          # OpenRouter authenticates with a Bearer token via ANTHROPIC_AUTH_TOKEN,
+          # and ANTHROPIC_API_KEY MUST be empty or it conflicts.
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ""
+          # Map every Claude model tier to an OpenRouter slug. Override via repo
+          # *variables* (Settings -> Variables) without editing this file.
           # NOTE: free/non-Claude models vary in tool-calling reliability — if the
-          # agent misbehaves, switch OPENROUTER_MODEL to a paid Claude model.
+          # agent misbehaves, switch OPENROUTER_MODEL to a stronger/paid model.
           ANTHROPIC_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
           ANTHROPIC_SMALL_FAST_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
-          # gh CLI + Claude use this token to push the branch and open the PR.
+          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
+          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
+          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
+          # gh CLI + git use this to push the branch and open the PR.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cat > "${RUNNER_TEMP}/agent_prompt.txt" <<'PROMPT'
+          You are an autonomous Flutter engineer working on a Todo app.
+
+          Your goal: make ONE meaningful, small, incremental change and open a PR.
+
+          Steps:
+          1. Read AGENTS.md first.
+          2. Read .ai/ARCHITECTURE.md and .ai/DEVELOPMENT.md.
+          3. Read .ai/TASKS.md and pick the FIRST unchecked "Day NN" task.
+          4. Implement ONLY that task. Follow the existing architecture.
+             Do not implement other days. Do not refactor unrelated code.
+          5. Add or update tests for the logic you wrote.
+          6. Run validation: `dart format .`, then `flutter analyze`, then
+             `flutter test`. All three must pass.
+          7. If validation fails, fix it. If it cannot pass cleanly, make NO
+             changes and stop.
+          8. When it passes, tick that Day's checkbox in .ai/TASKS.md (and the
+             matching item in .ai/ROADMAP.md if the feature is complete).
+          9. Update README.md: keep a short project description at the top, and
+             under a "## Progress" section add ONE concise bullet for the task you
+             just finished (e.g. "- Day 05: SQLite insert for todos"). Keep it
+             brief — do not rewrite the whole file.
+          10. Create a branch named `feat/ai/<YYYY-MM-DD>-<short-task-slug>`.
+          11. Commit with a Conventional Commit message, e.g.
+              `feat(todo): add SQLite insert for todo items`.
+          12. Push the branch and open a Pull Request against `main` using the
+              `gh` CLI. The PR body must state which Day task was done and how it
+              was validated.
+
+          Hard rules:
+          - Do exactly ONE task. Prefer the smallest correct implementation.
+          - Never push to main. Never modify secrets or CI credentials.
+          - Do not add dependencies unless the task requires it.
+          - Do NOT add any AI attribution: no "Co-Authored-By", no "Generated with
+            Claude", no bot signatures, in commits OR in the PR body.
+          PROMPT
+
+          claude -p "$(cat "${RUNNER_TEMP}/agent_prompt.txt")" \
+            --dangerously-skip-permissions \
+            --max-turns 40 \
+            --verbose
