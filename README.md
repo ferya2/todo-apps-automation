@@ -1,16 +1,33 @@
-# todo_app
+# Todo App
 
-A new Flutter project.
+A cross-platform mobile **Todo List** app built with **Flutter** and **SQLite**
+(local, on-device — no backend). Built incrementally by an autonomous AI
+development agent: one small, reviewed task per day.
+
+## Tech Stack
+
+- Flutter (Dart)
+- SQLite via `sqflite`
+- `provider` for state management
+
+## How It's Built
+
+- Features are planned in [.ai/ROADMAP.md](.ai/ROADMAP.md) and broken into a
+  30-day plan in [.ai/TASKS.md](.ai/TASKS.md).
+- A daily GitHub Actions workflow picks one task, implements it, runs
+  `dart format` / `flutter analyze` / `flutter test`, and opens a Pull Request.
+- Releases (versioned APK) are cut automatically on merge to `main` via
+  semantic-release.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run
+```
 
-A few resources to get you started if this is your first Flutter project:
+## Progress
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+<!-- The agent appends one short bullet here per completed task. -->
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Project scaffolding and autonomous CI/CD pipeline set up.

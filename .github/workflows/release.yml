@@ -5,14 +5,23 @@ name: Release
 # next version, bumps pubspec.yaml, builds the release APK, creates the git tag
 # + GitHub Release, and attaches the APK to that release.
 #
-# Trigger it manually when you want to cut a release. (Switch to push:main later
-# if you ever want a release on every merge.)
+# Runs automatically on every merge to main (plus a manual button as backup).
+# semantic-release is the guard: a release only happens if there is at least one
+# `feat:`/`fix:` commit since the last tag. Pure `chore:`/`docs:` merges produce
+# no release, so not every merge builds an APK.
 #
-# NOTE: a release only happens if there is at least one `feat:`/`fix:` commit
-# since the last tag. Pure `chore:`/`docs:` commits produce no release.
+# The version-bump commit it pushes back carries "[skip ci]", which GitHub honors
+# natively — so that commit does NOT re-trigger this workflow (no infinite loop).
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
+
+# Never run two releases at once — they would fight over the version-bump commit.
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 permissions:
   contents: write # create tags, releases, and push the version-bump commit

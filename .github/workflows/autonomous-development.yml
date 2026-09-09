@@ -74,10 +74,14 @@ jobs:
                changes and stop.
             8. When it passes, tick that Day's checkbox in .ai/TASKS.md (and the
                matching item in .ai/ROADMAP.md if the feature is complete).
-            9. Create a branch named `feat/ai/<YYYY-MM-DD>-<short-task-slug>`.
-            10. Commit with a Conventional Commit message, e.g.
+            9. Update README.md: keep a short project description at the top, and
+               under a "## Progress" section add ONE concise bullet for the task you
+               just finished (e.g. "- Day 05: SQLite insert for todos"). Keep it
+               brief — do not rewrite the whole file.
+            10. Create a branch named `feat/ai/<YYYY-MM-DD>-<short-task-slug>`.
+            11. Commit with a Conventional Commit message, e.g.
                 `feat(todo): add SQLite insert for todo items`.
-            11. Push the branch and open a Pull Request against `main` using the
+            12. Push the branch and open a Pull Request against `main` using the
                 `gh` CLI. The PR body must state which Day task was done and how
                 it was validated.
 

@@ -48,6 +48,9 @@ Do NOT introduce a new architectural pattern unless the task explicitly requires
   automatically by the release workflow (semantic-release).
 - Do NOT add any AI attribution (no `Co-Authored-By`, no "Generated with
   Claude", no bot signatures) to commits or PR descriptions.
+- After completing a task, update `README.md`: keep the short project
+  description current and append ONE brief bullet under `## Progress` for the
+  task you finished. Keep it concise — do not rewrite the whole README.
 
 ## Budget Awareness (IMPORTANT)
 
