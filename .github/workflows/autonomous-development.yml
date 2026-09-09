@@ -6,12 +6,9 @@ name: Autonomous Development
 
 on:
   schedule:
-    # ⚠️ TESTING: 08:45 UTC == 15:45 WIB. GitHub cron is often 5-15 min late.
-    # After you confirm one run works, switch back to the daily line below.
-    - cron: "45 8 * * *"
-    # PRODUCTION (restore this after testing): 20:00 UTC == 03:00 WIB (UTC+7)
-    # - cron: "0 20 * * *"
-  # Allow manual runs from the Actions tab — the fastest, most reliable test.
+    # Daily at 20:00 UTC == 03:00 WIB (UTC+7). GitHub cron may run 5-15 min late.
+    - cron: "0 20 * * *"
+  # Allow manual runs from the Actions tab anytime.
   workflow_dispatch:
 
 # Only one autonomous run at a time — avoids two agents racing on ROADMAP.md.
