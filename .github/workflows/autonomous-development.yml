@@ -62,6 +62,10 @@ jobs:
           # and ANTHROPIC_API_KEY MUST be empty or it conflicts.
           ANTHROPIC_AUTH_TOKEN: ${{ secrets.OPENROUTER_API_KEY }}
           ANTHROPIC_API_KEY: ""
+          # Claude Code validates model names against its built-in catalog and
+          # rejects unknown OpenRouter slugs. This tells it to trust the API
+          # instead (it assumes a 200k context window for the unknown model).
+          CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT: "1"
           # Map every Claude model tier to an OpenRouter slug. Override via repo
           # *variables* (Settings -> Variables) without editing this file.
           # NOTE: free/non-Claude models vary in tool-calling reliability — if the
