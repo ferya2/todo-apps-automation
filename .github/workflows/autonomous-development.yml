@@ -37,7 +37,7 @@ jobs:
       - name: Configure Git
         run: |
           # Commit as the repo owner so every automated commit shows on their account.
-          git config user.name "fery"
+          git config user.name "ferya2"
           git config user.email "adefery221@gmail.com"
 
       - name: Setup Flutter
