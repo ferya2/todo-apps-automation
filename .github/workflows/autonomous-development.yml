@@ -1,0 +1,107 @@
+name: Autonomous Development
+
+# Runs the AI coding agent once per day. It does ONE small task from
+# .ai/TASKS.md, validates it, and opens a Pull Request. It never builds the
+# APK (that lives in build-apk.yml) and never pushes to main directly.
+
+on:
+  schedule:
+    # ⚠️ TESTING: 08:45 UTC == 15:45 WIB. GitHub cron is often 5-15 min late.
+    # After you confirm one run works, switch back to the daily line below.
+    - cron: "45 8 * * *"
+    # PRODUCTION (restore this after testing): 20:00 UTC == 03:00 WIB (UTC+7)
+    # - cron: "0 20 * * *"
+  # Allow manual runs from the Actions tab — the fastest, most reliable test.
+  workflow_dispatch:
+
+# Only one autonomous run at a time — avoids two agents racing on ROADMAP.md.
+concurrency:
+  group: autonomous-development
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  develop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # keep runs bounded; the task is meant to be small
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          # Commit as the repo owner so every automated commit shows on their account.
+          git config user.name "fery"
+          git config user.email "adefery221@gmail.com"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.3
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run AI Developer
+        uses: anthropics/claude-code-action@v1
+        with:
+          # OpenRouter key stored as a repo secret. Claude Code talks to
+          # OpenRouter's Anthropic-compatible endpoint (see env below).
+          anthropic_api_key: ${{ secrets.OPENROUTER_API_KEY }}
+          prompt: |
+            You are an autonomous Flutter engineer working on a Todo app.
+
+            Your goal: make ONE meaningful, small, incremental change and open a PR.
+
+            Steps:
+            1. Read AGENTS.md first.
+            2. Read .ai/ARCHITECTURE.md and .ai/DEVELOPMENT.md.
+            3. Read .ai/TASKS.md and pick the FIRST unchecked "Day NN" task.
+            4. Implement ONLY that task. Follow the existing architecture.
+               Do not implement other days. Do not refactor unrelated code.
+            5. Add or update tests for the logic you wrote.
+            6. Run validation: `dart format .`, then `flutter analyze`,
+               then `flutter test`. All three must pass.
+            7. If validation fails, fix it. If it cannot pass cleanly, make NO
+               changes and stop.
+            8. When it passes, tick that Day's checkbox in .ai/TASKS.md (and the
+               matching item in .ai/ROADMAP.md if the feature is complete).
+            9. Create a branch named `feat/ai/<YYYY-MM-DD>-<short-task-slug>`.
+            10. Commit with a Conventional Commit message, e.g.
+                `feat(todo): add SQLite insert for todo items`.
+            11. Push the branch and open a Pull Request against `main` using the
+                `gh` CLI. The PR body must state which Day task was done and how
+                it was validated.
+
+            Hard rules:
+            - Do exactly ONE task. Prefer the smallest correct implementation.
+            - Never push to main. Never modify secrets or CI credentials.
+            - Do not add dependencies unless the task requires it.
+            - Do NOT add any AI attribution: no "Co-Authored-By", no "Generated
+              with Claude", no bot signatures, in commits OR in the PR body.
+          # Give the agent the tools it needs: run Flutter/git/gh and edit files.
+          claude_args: >-
+            --allowedTools "Bash,Edit,Write,Read,Glob,Grep"
+            --max-turns 40
+        env:
+          # --- OpenRouter wiring ---
+          # Claude Code appends /v1/messages to this base URL, so the final call
+          # is https://openrouter.ai/api/v1/messages (OpenRouter's Anthropic API).
+          ANTHROPIC_BASE_URL: https://openrouter.ai/api
+          # Model slugs are OpenRouter slugs. Set repo *variables* to change them
+          # without editing this file. Defaults use free models.
+          # NOTE: free/non-Claude models vary in tool-calling reliability — if the
+          # agent misbehaves, switch OPENROUTER_MODEL to a paid Claude model.
+          ANTHROPIC_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
+          ANTHROPIC_SMALL_FAST_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
+          # gh CLI + Claude use this token to push the branch and open the PR.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
