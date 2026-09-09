@@ -120,3 +120,28 @@ jobs:
             --dangerously-skip-permissions \
             --max-turns 40 \
             --verbose
+
+      - name: Verify and auto-merge if tests pass
+        env:
+          # Must be a PAT (not GITHUB_TOKEN): a GITHUB_TOKEN merge would neither
+          # be attributed to you nor trigger release.yml (GitHub anti-loop rule).
+          GH_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          set -e
+          BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+          if [ "$BRANCH" = "main" ]; then
+            echo "Agent stayed on main (no task/PR). Nothing to merge."
+            exit 0
+          fi
+          if ! gh pr view "$BRANCH" >/dev/null 2>&1; then
+            echo "No open PR for '$BRANCH'. Nothing to merge."
+            exit 0
+          fi
+
+          echo "== Independent verification gate =="
+          flutter pub get
+          flutter analyze
+          flutter test
+
+          echo "== Tests green -> auto-merging PR (squash) =="
+          gh pr merge "$BRANCH" --squash --delete-branch
