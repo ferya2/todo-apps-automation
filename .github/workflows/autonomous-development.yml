@@ -115,10 +115,29 @@ jobs:
             Claude", no bot signatures, in commits OR in the PR body.
           PROMPT
 
+          # Stream the agent's progress live to the Actions log so you can watch
+          # how far it has gotten. stream-json emits one JSON event per line as it
+          # happens; jq turns each into a readable line (🤖 message, 🔧 tool call,
+          # ✅ done). bash pipefail is on by default here, so claude's exit code is
+          # preserved through the pipe. jq's `fromjson?` skips any non-JSON line.
           claude -p "$(cat "${RUNNER_TEMP}/agent_prompt.txt")" \
             --dangerously-skip-permissions \
             --max-turns 40 \
-            --verbose
+            --verbose \
+            --output-format stream-json \
+            | jq -Rr --unbuffered '
+                fromjson? as $e
+                | if $e.type == "assistant" then
+                    ( $e.message.content[]?
+                      | if .type == "text" and ((.text|length) > 0)
+                          then "🤖 " + (.text | gsub("\n";" ") | .[0:200])
+                        elif .type == "tool_use"
+                          then "🔧 " + .name + ": " + (.input | tostring | .[0:150])
+                        else empty end )
+                  elif $e.type == "result" then
+                    "✅ " + ($e.subtype // "done") + " — turns: " + (($e.num_turns // 0)|tostring)
+                  else empty end
+              '
 
       - name: Verify and auto-merge if tests pass
         env:
