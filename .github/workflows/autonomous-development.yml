@@ -70,11 +70,11 @@ jobs:
           # *variables* (Settings -> Variables) without editing this file.
           # NOTE: free/non-Claude models vary in tool-calling reliability — if the
           # agent misbehaves, switch OPENROUTER_MODEL to a stronger/paid model.
-          ANTHROPIC_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
-          ANTHROPIC_SMALL_FAST_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
-          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
-          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.OPENROUTER_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
-          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'deepseek/deepseek-chat-v3-0324:free' }}
+          ANTHROPIC_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_SMALL_FAST_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'poolside/laguna-s-2.1:free' }}
           # gh CLI + git use this to push the branch and open the PR.
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
