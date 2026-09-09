@@ -11,7 +11,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
 
 ## Week 1 — Foundation
 
-- [ ] **Day 01 — Project scaffold.** Initialize the Flutter project. Create the
+- [x] **Day 01 — Project scaffold.** Initialize the Flutter project. Create the
   folder structure from `AGENTS.md` (`data/`, `models/`, `providers/`, `screens/`,
   `widgets/`, `utils/`) with placeholder files. App runs and shows an empty home.
 - [ ] **Day 02 — Dependencies.** Add `sqflite`, `path`, `provider` to

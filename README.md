@@ -31,3 +31,6 @@ flutter run
 <!-- The agent appends one short bullet here per completed task. -->
 
 - Project scaffolding and autonomous CI/CD pipeline set up.
+- Day 01: project scaffold — created the `data/`, `models/`, `providers/`,
+  `screens/`, `widgets/`, `utils/` folder structure with placeholder files;
+  app runs and shows an empty Todo home.
