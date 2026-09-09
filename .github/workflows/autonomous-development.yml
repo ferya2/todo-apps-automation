@@ -101,8 +101,9 @@ jobs:
              under a "## Progress" section add ONE concise bullet for the task you
              just finished (e.g. "- Day 05: SQLite insert for todos"). Keep it
              brief — do not rewrite the whole file.
-          10. Create a branch named `feat/day<N>/<YYYY-MM-DD>` where <N> is the
-              day number from the task (e.g. for Day 02 today: `feat/day2/2026-09-09`).
+          10. Create a branch named `feat/day<NN>/<YYYY-MM-DD>` where <NN> is the
+              zero-padded day number from the task (e.g. for Day 02 today:
+              `feat/day02/2026-09-09`).
           11. Commit with a Conventional Commit message, e.g.
               `feat(todo): add SQLite insert for todo items`.
           12. Push the branch and open a Pull Request against `main` using the
