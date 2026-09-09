@@ -47,34 +47,7 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Install Claude Code CLI
-        run: npm install -g @anthropic-ai/claude-code
-
-      - name: Run AI Developer
-        env:
-          # --- OpenRouter wiring (per OpenRouter's official Claude Code docs) ---
-          # Base URL: Claude Code appends /v1/messages -> openrouter.ai/api/v1/messages
-          ANTHROPIC_BASE_URL: https://openrouter.ai/api
-          # OpenRouter authenticates with a Bearer token via ANTHROPIC_AUTH_TOKEN,
-          # and ANTHROPIC_API_KEY MUST be empty or it conflicts.
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.OPENROUTER_API_KEY }}
-          ANTHROPIC_API_KEY: ""
-          # Claude Code validates model names against its built-in catalog and
-          # rejects unknown OpenRouter slugs. This tells it to trust the API
-          # instead (it assumes a 200k context window for the unknown model).
-          CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT: "1"
-          # Map every Claude model tier to an OpenRouter slug. Override via repo
-          # *variables* (Settings -> Variables) without editing this file.
-          # NOTE: free/non-Claude models vary in tool-calling reliability — if the
-          # agent misbehaves, switch OPENROUTER_MODEL to a stronger/paid model.
-          ANTHROPIC_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
-          ANTHROPIC_SMALL_FAST_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'poolside/laguna-s-2.1:free' }}
-          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
-          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
-          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'poolside/laguna-s-2.1:free' }}
-          # gh CLI + git use this to push the branch and open the PR.
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Write shared agent prompt
         run: |
           cat > "${RUNNER_TEMP}/agent_prompt.txt" <<'PROMPT'
           You are an autonomous Flutter engineer working on a Todo app.
@@ -100,12 +73,13 @@ jobs:
              brief — do not rewrite the whole file.
           10. Create a branch named `feat/day<NN>/<YYYY-MM-DD>` where <NN> is the
               zero-padded day number from the task (e.g. for Day 02 today:
-              `feat/day02/2026-09-09`).
+              `feat/day02/2026-09-09`). If that branch already exists (a previous
+              attempt), reuse it.
           11. Commit with a Conventional Commit message, e.g.
               `feat(todo): add SQLite insert for todo items`.
           12. Push the branch and open a Pull Request against `main` using the
-              `gh` CLI. The PR body must state which Day task was done and how it
-              was validated.
+              `gh` CLI (skip this if an open PR for the branch already exists). The
+              PR body must state which Day task was done and how it was validated.
 
           Hard rules:
           - Do exactly ONE task. Prefer the smallest correct implementation.
@@ -115,6 +89,37 @@ jobs:
             Claude", no bot signatures, in commits OR in the PR body.
           PROMPT
 
+      - name: Install Claude Code CLI
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Run AI Developer (primary - Claude Code + OpenRouter)
+        id: primary
+        continue-on-error: true # if this fails (e.g. rate limit), OpenCode takes over
+        env:
+          # --- OpenRouter wiring (per OpenRouter's official Claude Code docs) ---
+          # Base URL: Claude Code appends /v1/messages -> openrouter.ai/api/v1/messages
+          ANTHROPIC_BASE_URL: https://openrouter.ai/api
+          # OpenRouter authenticates with a Bearer token via ANTHROPIC_AUTH_TOKEN,
+          # and ANTHROPIC_API_KEY MUST be empty or it conflicts.
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.OPENROUTER_API_KEY }}
+          ANTHROPIC_API_KEY: ""
+          # Claude Code validates model names against its built-in catalog and
+          # rejects unknown OpenRouter slugs. This tells it to trust the API
+          # instead (it assumes a 200k context window for the unknown model).
+          CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT: "1"
+          # Map every Claude model tier to an OpenRouter slug. Override via repo
+          # *variables* (Settings -> Variables) without editing this file.
+          # NOTE: free/non-Claude models vary in tool-calling reliability — if the
+          # agent misbehaves, switch OPENROUTER_MODEL to a stronger/paid model.
+          ANTHROPIC_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_SMALL_FAST_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_DEFAULT_OPUS_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_DEFAULT_SONNET_MODEL: ${{ vars.OPENROUTER_MODEL || 'poolside/laguna-s-2.1:free' }}
+          ANTHROPIC_DEFAULT_HAIKU_MODEL: ${{ vars.OPENROUTER_SMALL_MODEL || 'poolside/laguna-s-2.1:free' }}
+          # gh CLI + git use this to push the branch and open the PR.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
           # Stream the agent's progress live to the Actions log so you can watch
           # how far it has gotten. stream-json emits one JSON event per line as it
           # happens; jq turns each into a readable line (🤖 message, 🔧 tool call,
@@ -138,6 +143,24 @@ jobs:
                     "✅ " + ($e.subtype // "done") + " — turns: " + (($e.num_turns // 0)|tostring)
                   else empty end
               '
+
+      - name: Run AI Developer (fallback - OpenCode)
+        if: steps.primary.outcome == 'failure'
+        env:
+          # OpenCode uses a DIFFERENT backend than OpenRouter, so its quota is
+          # separate — that is what makes it a real fallback when the OpenRouter
+          # free model is rate-limited. Set OPENCODE_API_KEY (from OpenCode Zen at
+          # opencode.ai/zen) to use a free `opencode/` model, OR point
+          # OPENCODE_MODEL at another provider whose key you also add here.
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Primary (Claude Code + OpenRouter) failed — falling back to OpenCode."
+          npm install -g opencode-ai
+          opencode run --auto \
+            --model "${{ vars.OPENCODE_MODEL || 'opencode/big-pickle' }}" \
+            "$(cat "${RUNNER_TEMP}/agent_prompt.txt")"
 
       - name: Verify and auto-merge if tests pass
         env:
