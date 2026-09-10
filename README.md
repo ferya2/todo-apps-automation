@@ -38,3 +38,5 @@ flutter run
   (`sqflite_common_ffi` for tests) with a wiring smoke test.
 - Day 03: added `DatabaseHelper` singleton — opens/creates SQLite DB (schema v1,
   no tables) with an `onUpgrade` hook, unit-tested with `sqflite_common_ffi`.
+- Day 04: added the `Todo` model — `id`, `title`, `isCompleted`, `createdAt`
+  with `toMap()` / `fromMap()` and full unit tests.
