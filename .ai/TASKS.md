@@ -16,10 +16,10 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   `widgets/`, `utils/`) with placeholder files. App runs and shows an empty home.
 - [x] **Day 02 — Dependencies.** Add `sqflite`, `path`, `provider` to
   `pubspec.yaml`. Run `flutter pub get`. No feature yet — just wiring + a smoke test.
-- [ ] **Day 03 — DatabaseHelper.** Create a singleton `DatabaseHelper` in `data/`
+- [x] **Day 03 — DatabaseHelper.** Create a singleton `DatabaseHelper` in `data/`
   that opens/creates the SQLite DB (schema version 1, no tables yet). Unit test it
   opens successfully with `sqflite_common_ffi`.
-- [ ] **Day 04 — Todo model.** Create the `Todo` model in `models/` (id, title,
+- [x] **Day 04 — Todo model.** Create the `Todo` model in `models/` (id, title,
   isCompleted, createdAt). Add `toMap()` / `fromMap()`. Full unit test.
 - [ ] **Day 05 — todos table + insert DAO.** Add the `todos` table to the schema.
   Create `TodoDao.insert(todo)`. Unit test insert returns an id.
