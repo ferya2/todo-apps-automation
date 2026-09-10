@@ -8,7 +8,7 @@ level. Tick a box when the whole feature is done.
 
 - [x] Flutter project scaffold + folder structure
 - [x] Dependencies (sqflite, path, provider)
-- [ ] SQLite `DatabaseHelper` (open/create DB)
+- [x] SQLite `DatabaseHelper` (open/create DB)
 - [ ] `Todo` model
 - [ ] Todo DAO: create
 - [ ] Todo DAO: read / list

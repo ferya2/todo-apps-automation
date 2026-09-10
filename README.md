@@ -36,3 +36,5 @@ flutter run
   app runs and shows an empty Todo home.
 - Day 02: added dependencies — `sqflite`, `path`, `provider`
   (`sqflite_common_ffi` for tests) with a wiring smoke test.
+- Day 03: added `DatabaseHelper` singleton — opens/creates SQLite DB (schema v1,
+  no tables) with an `onUpgrade` hook, unit-tested with `sqflite_common_ffi`.
