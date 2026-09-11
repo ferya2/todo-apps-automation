@@ -10,7 +10,7 @@ level. Tick a box when the whole feature is done.
 - [x] Dependencies (sqflite, path, provider)
 - [x] SQLite `DatabaseHelper` (open/create DB)
 - [x] `Todo` model
-- [ ] Todo DAO: create
+- [x] Todo DAO: create
 - [ ] Todo DAO: read / list
 - [ ] Todo DAO: update
 - [ ] Todo DAO: delete

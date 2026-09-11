@@ -1,0 +1,21 @@
+import 'package:todo_app/data/database_helper.dart';
+import 'package:todo_app/models/todo.dart';
+
+/// Data access object for the `todos` table.
+class TodoDao {
+  /// Creates a DAO backed by the given [DatabaseHelper].
+  TodoDao(this.helper);
+
+  /// The database helper this DAO reads from and writes to.
+  final DatabaseHelper helper;
+
+  /// Inserts [todo] and returns the new row's auto-generated id.
+  ///
+  /// The [Todo.id] is excluded so SQLite assigns it via `AUTOINCREMENT`.
+  Future<int> insert(Todo todo) async {
+    final db = await helper.database;
+    final values = Map<String, Object?>.from(todo.toMap());
+    values.remove('id');
+    return db.insert('todos', values);
+  }
+}
