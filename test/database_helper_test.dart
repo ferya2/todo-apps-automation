@@ -27,7 +27,7 @@ void main() {
       expect(db.isOpen, isTrue);
     });
 
-    test('reports schema version 1', () async {
+    test('reports schema version 2', () async {
       final db = await helper.database;
       expect(await db.getVersion(), DatabaseHelper.schemaVersion);
     });

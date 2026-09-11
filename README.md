@@ -40,3 +40,7 @@ flutter run
   no tables) with an `onUpgrade` hook, unit-tested with `sqflite_common_ffi`.
 - Day 04: added the `Todo` model — `id`, `title`, `isCompleted`, `createdAt`
   with `toMap()` / `fromMap()` and full unit tests.
+- Day 05: added the `todos` table (schema v2 migration) and `TodoDao.insert`,
+  which returns the auto-generated id; unit-tested with `sqflite_common_ffi`.
+- Day 06: added `TodoDao.getAll()` and `TodoDao.getById(id)` with round-trip
+  unit tests (insert then read).
