@@ -23,7 +23,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   isCompleted, createdAt). Add `toMap()` / `fromMap()`. Full unit test.
 - [x] **Day 05 — todos table + insert DAO.** Add the `todos` table to the schema.
   Create `TodoDao.insert(todo)`. Unit test insert returns an id.
-- [ ] **Day 06 — read DAO.** Add `TodoDao.getAll()` and `TodoDao.getById(id)`.
+- [x] **Day 06 — read DAO.** Add `TodoDao.getAll()` and `TodoDao.getById(id)`.
   Unit test round-trip (insert then read).
 - [ ] **Day 07 — update & delete DAO.** Add `TodoDao.update(todo)` and
   `TodoDao.delete(id)`. Unit test both.

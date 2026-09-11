@@ -18,4 +18,20 @@ class TodoDao {
     values.remove('id');
     return db.insert('todos', values);
   }
+
+  /// Returns all todos ordered by insertion order (`id` ascending), or an
+  /// empty list if none exist.
+  Future<List<Todo>> getAll() async {
+    final db = await helper.database;
+    final rows = await db.query('todos', orderBy: 'id ASC');
+    return rows.map(Todo.fromMap).toList();
+  }
+
+  /// Returns the todo with the given [id], or null if no such row exists.
+  Future<Todo?> getById(int id) async {
+    final db = await helper.database;
+    final rows = await db.query('todos', where: 'id = ?', whereArgs: [id]);
+    if (rows.isEmpty) return null;
+    return Todo.fromMap(rows.first);
+  }
 }

@@ -11,7 +11,7 @@ level. Tick a box when the whole feature is done.
 - [x] SQLite `DatabaseHelper` (open/create DB)
 - [x] `Todo` model
 - [x] Todo DAO: create
-- [ ] Todo DAO: read / list
+- [x] Todo DAO: read / list
 - [ ] Todo DAO: update
 - [ ] Todo DAO: delete
 
