@@ -34,4 +34,20 @@ class TodoDao {
     if (rows.isEmpty) return null;
     return Todo.fromMap(rows.first);
   }
+
+  /// Updates the row matching [Todo.id] with [todo]'s current field values.
+  /// Returns the number of rows affected (0 if no row exists for the id).
+  Future<int> update(Todo todo) async {
+    final db = await helper.database;
+    final values = Map<String, Object?>.from(todo.toMap());
+    values.remove('id');
+    return db.update('todos', values, where: 'id = ?', whereArgs: [todo.id]);
+  }
+
+  /// Deletes the todo row with the given [id].
+  /// Returns the number of rows deleted (1 if deleted, 0 if no such row).
+  Future<int> delete(int id) async {
+    final db = await helper.database;
+    return db.delete('todos', where: 'id = ?', whereArgs: [id]);
+  }
 }

@@ -75,5 +75,45 @@ void main() {
       final todos = await dao.getAll();
       expect(todos, isEmpty);
     });
+
+    group('update', () {
+      test('updates the title and isCompleted fields', () async {
+        final id = await dao.insert(Todo(title: 'Original'));
+        final saved = (await dao.getById(id))!;
+
+        final updated = Todo(
+          id: saved.id,
+          title: 'Updated title',
+          isCompleted: true,
+          createdAt: saved.createdAt,
+        );
+        final changed = await dao.update(updated);
+
+        expect(changed, 1);
+        final fetched = await dao.getById(id);
+        expect(fetched!.title, 'Updated title');
+        expect(fetched.isCompleted, true);
+      });
+
+      test('returns 0 when updating a non-existent id', () async {
+        final changed = await dao.update(Todo(id: 999, title: 'Ghost'));
+        expect(changed, 0);
+      });
+    });
+
+    group('delete', () {
+      test('deletes the todo and returns 1', () async {
+        final id = await dao.insert(Todo(title: 'To be deleted'));
+        final deleted = await dao.delete(id);
+
+        expect(deleted, 1);
+        expect(await dao.getById(id), isNull);
+      });
+
+      test('returns 0 when deleting a non-existent id', () async {
+        final deleted = await dao.delete(999);
+        expect(deleted, 0);
+      });
+    });
   });
 }
