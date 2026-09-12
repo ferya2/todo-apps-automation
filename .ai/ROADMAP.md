@@ -17,7 +17,7 @@ level. Tick a box when the whole feature is done.
 
 ## Phase 2 — Core UI (Week 2)
 
-- [ ] App theme + home screen scaffold
+- [x] App theme + home screen scaffold
 - [ ] TodoProvider (state management)
 - [ ] Todo list view (render from DB)
 - [ ] Add todo screen + form

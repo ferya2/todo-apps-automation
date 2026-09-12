@@ -30,7 +30,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
 
 ## Week 2 — Core UI
 
-- [ ] **Day 08 — Theme + home scaffold.** App theme (colors, typography) and a
+- [x] **Day 08 — Theme + home scaffold.** App theme (colors, typography) and a
   `HomeScreen` with an AppBar and an empty body + FAB placeholder. Widget test it
   renders.
 - [ ] **Day 09 — TodoProvider.** Create `TodoProvider` (ChangeNotifier) that loads

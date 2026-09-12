@@ -46,3 +46,5 @@ flutter run
   unit tests (insert then read).
 - Day 07: added `TodoDao.update(todo)` and `TodoDao.delete(id)` with unit tests
   for field updates, non-existent rows, and round-trip delete.
+- Day 08: added `AppTheme` (Material 3 colors + typography) and a `HomeScreen`
+  scaffold with an AppBar, an empty body, and a FAB placeholder; widget-tested.
