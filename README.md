@@ -44,3 +44,5 @@ flutter run
   which returns the auto-generated id; unit-tested with `sqflite_common_ffi`.
 - Day 06: added `TodoDao.getAll()` and `TodoDao.getById(id)` with round-trip
   unit tests (insert then read).
+- Day 07: added `TodoDao.update(todo)` and `TodoDao.delete(id)` with unit tests
+  for field updates, non-existent rows, and round-trip delete.
