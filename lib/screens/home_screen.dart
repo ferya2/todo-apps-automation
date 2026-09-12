@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 /// The home screen for the Todo app.
 ///
-/// Placeholder: renders an empty home. Real content (the todo list, FAB,
-/// theming) will be added incrementally per the roadmap.
+/// Currently a scaffold: an AppBar with an empty body and a FloatingActionButton
+/// placeholder. Real content (the todo list) will be added per the roadmap.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -12,6 +12,11 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Todo')),
       body: const Center(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        tooltip: 'Add todo',
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

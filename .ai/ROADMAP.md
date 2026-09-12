@@ -12,12 +12,12 @@ level. Tick a box when the whole feature is done.
 - [x] `Todo` model
 - [x] Todo DAO: create
 - [x] Todo DAO: read / list
-- [ ] Todo DAO: update
-- [ ] Todo DAO: delete
+- [x] Todo DAO: update
+- [x] Todo DAO: delete
 
 ## Phase 2 — Core UI (Week 2)
 
-- [ ] App theme + home screen scaffold
+- [x] App theme + home screen scaffold
 - [ ] TodoProvider (state management)
 - [ ] Todo list view (render from DB)
 - [ ] Add todo screen + form

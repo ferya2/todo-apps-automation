@@ -25,12 +25,12 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   Create `TodoDao.insert(todo)`. Unit test insert returns an id.
 - [x] **Day 06 — read DAO.** Add `TodoDao.getAll()` and `TodoDao.getById(id)`.
   Unit test round-trip (insert then read).
-- [ ] **Day 07 — update & delete DAO.** Add `TodoDao.update(todo)` and
-  `TodoDao.delete(id)`. Unit test both.
+- [x] **Day 07 — update & delete DAO.** Added `TodoDao.update(todo)` and
+  `TodoDao.delete(id)` with unit tests.
 
 ## Week 2 — Core UI
 
-- [ ] **Day 08 — Theme + home scaffold.** App theme (colors, typography) and a
+- [x] **Day 08 — Theme + home scaffold.** App theme (colors, typography) and a
   `HomeScreen` with an AppBar and an empty body + FAB placeholder. Widget test it
   renders.
 - [ ] **Day 09 — TodoProvider.** Create `TodoProvider` (ChangeNotifier) that loads
