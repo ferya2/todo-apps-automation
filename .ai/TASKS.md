@@ -35,7 +35,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   renders.
 - [x] **Day 09 — TodoProvider.** Create `TodoProvider` (ChangeNotifier) that loads
   todos from `TodoDao` and exposes the list. Unit test with an in-memory DAO.
-- [ ] **Day 10 — Todo list view.** Render the todos from the provider as a
+- [x] **Day 10 — Todo list view.** Render the todos from the provider as a
   `ListView` on the home screen. Widget test with seeded data.
 - [ ] **Day 11 — Add todo screen.** Create an `AddTodoScreen` with a title text
   field and a save button (UI only, validation for empty title). Widget test.

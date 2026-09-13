@@ -50,3 +50,5 @@ flutter run
   scaffold with an AppBar, an empty body, and a FAB placeholder; widget-tested.
 - Day 09: added `TodoProvider` (ChangeNotifier) that loads todos from `TodoDao`
   and exposes the list; unit-tested with an in-memory DAO.
+- Day 10: rendered the provider's todos as a `ListView` on the home screen,
+  wired the app to a `TodoProvider`, and added a widget test with seeded data.
