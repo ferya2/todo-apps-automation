@@ -54,3 +54,5 @@ flutter run
   wired the app to a `TodoProvider`, and added a widget test with seeded data.
 - Day 11: added an `AddTodoScreen` with a title field and Save button (UI only);
   the home FAB now opens it. Empty-title validation via widget test.
+- Day 12: wired the add screen → provider → DAO so saving a new todo persists it
+  to SQLite and it appears in the list; tested the full flow end-to-end.

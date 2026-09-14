@@ -40,7 +40,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
 - [x] **Day 11 — Add todo screen.** Created an `AddTodoScreen` with a title text
   field and a Save button (UI only, validation for empty title). Wired the home
   FAB to open it. Widget test.
-- [ ] **Day 12 — Save new todo.** Wire the add screen → provider → DAO so a new
+- [x] **Day 12 — Save new todo.** Wire the add screen → provider → DAO so a new
   todo persists and appears in the list. Test the flow.
 - [ ] **Day 13 — Toggle completed.** Add a checkbox on each list item that toggles
   `isCompleted` and persists it. Test the toggle updates the DB.

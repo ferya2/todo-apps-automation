@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:todo_app/models/todo.dart';
+import 'package:todo_app/providers/todo_provider.dart';
 
 /// A screen for creating a new todo.
 ///
 /// Contains a title text field and a Save button in the app bar. The title
 /// field is validated: pressing Save with an empty title shows an error and
-/// keeps the screen open. When the title is valid, Save returns to the
-/// previous route.
-///
-/// This screen is UI-only — persistence to the provider/DAO is wired in a
-/// later step, so Save does not yet write anything to the database.
+/// keeps the screen open. When the title is valid, the todo is persisted via
+/// the [TodoProvider] and this screen pops back to the previous route.
 class AddTodoScreen extends StatefulWidget {
   const AddTodoScreen({super.key});
 
@@ -26,11 +27,13 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
     super.dispose();
   }
 
-  /// Validates the form and, if valid, returns to the previous route.
-  /// Saving to the database lands in a later step (UI only for now).
+  /// Validates the form and, if valid, saves the todo via the provider and
+  /// pops back to the previous route.
   void _save() {
     final form = _formKey.currentState;
     if (form == null || !form.validate()) return;
+    final todo = Todo(title: _titleController.text.trim());
+    context.read<TodoProvider>().addTodo(todo);
     Navigator.of(context).pop();
   }
 

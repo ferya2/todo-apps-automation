@@ -8,7 +8,7 @@ import 'package:todo_app/screens/add_todo_screen.dart';
 ///
 /// Renders the todos from the [TodoProvider] as a [ListView]. The first load is
 /// kicked off once when the screen mounts. The FloatingActionButton opens the
-/// [AddTodoScreen]; saving a todo there is wired up in a later step.
+/// [AddTodoScreen]; saving a todo there persists it via the provider.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
