@@ -20,7 +20,7 @@ level. Tick a box when the whole feature is done.
 - [x] App theme + home screen scaffold
 - [x] TodoProvider (state management)
 - [x] Todo list view (render from DB)
-- [ ] Add todo screen + form
+- [x] Add todo screen + form
 - [ ] Save new todo to DB
 - [ ] Toggle "completed" state
 - [ ] Edit todo
