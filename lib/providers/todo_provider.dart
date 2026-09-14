@@ -15,7 +15,7 @@ class TodoProvider extends ChangeNotifier {
   /// Creates a provider backed by [dao].
   TodoProvider(this.dao);
 
-  /// The DAO this provider reads from and (later) writes to.
+  /// The DAO this provider reads from and writes to.
   final TodoDao dao;
 
   List<Todo> _todos = [];
@@ -29,5 +29,14 @@ class TodoProvider extends ChangeNotifier {
   Future<void> loadTodos() async {
     _todos = await dao.getAll();
     notifyListeners();
+  }
+
+  /// Saves [todo] via the DAO and reloads the list from the database so it
+  /// reflects the newly inserted row.
+  ///
+  /// Notifies listeners once the insert and reload complete.
+  Future<void> addTodo(Todo todo) async {
+    await dao.insert(todo);
+    await loadTodos();
   }
 }

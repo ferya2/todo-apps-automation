@@ -67,5 +67,29 @@ void main() {
 
       expect(notified, isTrue);
     });
+
+    test('addTodo inserts the todo via the DAO and reloads the list', () async {
+      await provider.addTodo(Todo(title: 'Buy groceries'));
+
+      final saved = (await dao.getAll()).single;
+      expect(saved.title, 'Buy groceries');
+      expect(provider.todos.single.title, 'Buy groceries');
+    });
+
+    test('addTodo appends to existing todos and notifies listeners', () async {
+      await dao.insert(Todo(title: 'Existing'));
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.addTodo(Todo(title: 'New one'));
+
+      expect(notified, isTrue);
+      expect(provider.todos.map((t) => t.title), ['Existing', 'New one']);
+      expect((await dao.getAll()).length, 2);
+    });
   });
 }
