@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:todo_app/providers/todo_provider.dart';
 import 'package:todo_app/screens/add_todo_screen.dart';
+import 'package:todo_app/screens/edit_todo_screen.dart';
 
 /// The home screen for the Todo app.
 ///
@@ -39,7 +40,22 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 final todo = todos[index];
-                return ListTile(title: Text(todo.title));
+                return ListTile(
+                  title: Text(todo.title),
+                  trailing: Checkbox(
+                    value: todo.isCompleted,
+                    onChanged: (_) {
+                      context.read<TodoProvider>().toggleCompleted(todo);
+                    },
+                  ),
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => EditTodoScreen(todo: todo),
+                      ),
+                    );
+                  },
+                );
               },
             ),
       floatingActionButton: FloatingActionButton(

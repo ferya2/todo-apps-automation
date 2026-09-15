@@ -91,5 +91,89 @@ void main() {
       expect(provider.todos.map((t) => t.title), ['Existing', 'New one']);
       expect((await dao.getAll()).length, 2);
     });
+
+    test(
+      'updateTodo updates the todo via the DAO and reloads the list',
+      () async {
+        final id = await dao.insert(Todo(title: 'Original'));
+        final existing = (await dao.getById(id))!;
+        await provider.loadTodos();
+
+        await provider.updateTodo(
+          Todo(
+            id: existing.id,
+            title: 'Renamed',
+            isCompleted: existing.isCompleted,
+            createdAt: existing.createdAt,
+          ),
+        );
+
+        final saved = await dao.getById(id);
+        expect(saved!.title, 'Renamed');
+        expect(provider.todos.single.title, 'Renamed');
+      },
+    );
+
+    test('updateTodo notifies listeners', () async {
+      final id = await dao.insert(Todo(title: 'Original'));
+      final existing = (await dao.getById(id))!;
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.updateTodo(
+        Todo(
+          id: existing.id,
+          title: 'Renamed',
+          isCompleted: existing.isCompleted,
+          createdAt: existing.createdAt,
+        ),
+      );
+
+      expect(notified, isTrue);
+    });
+
+    test('toggleCompleted flips isCompleted to true and persists', () async {
+      final id = await dao.insert(Todo(title: 'Task'));
+      await provider.loadTodos();
+
+      await provider.toggleCompleted(provider.todos.single);
+
+      final saved = await dao.getById(id);
+      expect(saved!.isCompleted, isTrue);
+      expect(provider.todos.single.isCompleted, isTrue);
+    });
+
+    test(
+      'toggleCompleted flips isCompleted back to false and persists',
+      () async {
+        final todo = Todo(title: 'Task')..isCompleted = true;
+        final id = await dao.insert(todo);
+        await provider.loadTodos();
+
+        await provider.toggleCompleted(provider.todos.single);
+
+        final saved = await dao.getById(id);
+        expect(saved!.isCompleted, isFalse);
+        expect(provider.todos.single.isCompleted, isFalse);
+      },
+    );
+
+    test('toggleCompleted notifies listeners', () async {
+      await dao.insert(Todo(title: 'Task'));
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.toggleCompleted(provider.todos.single);
+
+      expect(notified, isTrue);
+    });
   });
 }

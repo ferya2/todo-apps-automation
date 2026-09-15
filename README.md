@@ -56,3 +56,9 @@ flutter run
   the home FAB now opens it. Empty-title validation via widget test.
 - Day 12: wired the add screen → provider → DAO so saving a new todo persists it
   to SQLite and it appears in the list; tested the full flow end-to-end.
+- Day 13: added a completion checkbox to each list item — tapping it toggles
+  `isCompleted` via `TodoProvider.toggleCompleted` → `TodoDao.update` → SQLite;
+  tested the provider logic and the checkbox widget interaction with an in-memory DB.
+- Day 14: added an `EditTodoScreen` — tapping a todo on the home screen opens it
+  prefilled with the title; saving updates the DB via `TodoProvider.updateTodo`
+  and refreshes the list. Tested the full edit flow.
