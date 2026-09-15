@@ -38,4 +38,40 @@ void main() {
     expect(find.widgetWithText(ListTile, 'Buy groceries'), findsOneWidget);
     expect(find.widgetWithText(ListTile, 'Write tests'), findsOneWidget);
   });
+
+  testWidgets('tapping a checkbox toggles completion and persists to the DB', (
+    tester,
+  ) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+    final dao = TodoDao(helper);
+    final provider = TodoProvider(dao);
+    addTearDown(helper.close);
+
+    final id = await dao.insert(Todo(title: 'Task'));
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Checkbox), findsOneWidget);
+    expect(
+      tester.widget(find.byType(Checkbox)),
+      isA<Checkbox>().having((c) => c.value, 'value', isFalse),
+    );
+
+    await tester.tap(find.byType(Checkbox));
+    await tester.pumpAndSettle();
+
+    final saved = await dao.getById(id);
+    expect(saved!.isCompleted, isTrue);
+    expect(provider.todos.single.isCompleted, isTrue);
+  });
 }

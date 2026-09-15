@@ -39,7 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 final todo = todos[index];
-                return ListTile(title: Text(todo.title));
+                return ListTile(
+                  title: Text(todo.title),
+                  trailing: Checkbox(
+                    value: todo.isCompleted,
+                    onChanged: (_) {
+                      context.read<TodoProvider>().toggleCompleted(todo);
+                    },
+                  ),
+                );
               },
             ),
       floatingActionButton: FloatingActionButton(
