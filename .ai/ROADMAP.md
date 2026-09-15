@@ -22,7 +22,7 @@ level. Tick a box when the whole feature is done.
 - [x] Todo list view (render from DB)
 - [x] Add todo screen + form
 - [x] Save new todo to DB
-- [ ] Toggle "completed" state
+- [x] Toggle "completed" state
 - [ ] Edit todo
 - [ ] Delete todo (swipe to dismiss)
 

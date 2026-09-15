@@ -39,4 +39,14 @@ class TodoProvider extends ChangeNotifier {
     await dao.insert(todo);
     await loadTodos();
   }
+
+  /// Toggles the [Todo.isCompleted] flag on [todo], persists it via the DAO,
+  /// and reloads the list so the UI reflects the saved value.
+  ///
+  /// Notifies listeners once the update and reload complete.
+  Future<void> toggleCompleted(Todo todo) async {
+    todo.isCompleted = !todo.isCompleted;
+    await dao.update(todo);
+    await loadTodos();
+  }
 }
