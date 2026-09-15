@@ -44,7 +44,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   todo persists and appears in the list. Test the flow.
 - [x] **Day 13 — Toggle completed.** Add a checkbox on each list item that toggles
   `isCompleted` and persists it. Test the toggle updates the DB.
-- [ ] **Day 14 — Edit todo.** Tapping a todo opens an edit screen; saving updates
+- [x] **Day 14 — Edit todo.** Tapping a todo opens an edit screen; saving updates
   the DB and list. Test the update flow.
 
 ## Week 3 — Features
