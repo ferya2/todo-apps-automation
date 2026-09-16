@@ -8,6 +8,7 @@ class Todo {
     this.id,
     required this.title,
     this.isCompleted = false,
+    this.dueDate,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -20,6 +21,9 @@ class Todo {
   /// Whether the todo has been completed.
   bool isCompleted;
 
+  /// When the todo should be completed by, or null when there is no deadline.
+  final DateTime? dueDate;
+
   /// When the todo was created.
   final DateTime createdAt;
 
@@ -31,6 +35,7 @@ class Todo {
       'title': title,
       'isCompleted': isCompleted ? 1 : 0,
       'createdAt': createdAt.millisecondsSinceEpoch,
+      'dueDate': dueDate?.millisecondsSinceEpoch,
     };
   }
 
@@ -40,6 +45,9 @@ class Todo {
       id: map['id'] as int?,
       title: map['title'] as String,
       isCompleted: (map['isCompleted'] as int) == 1,
+      dueDate: map['dueDate'] == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(map['dueDate'] as int),
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
     );
   }

@@ -62,3 +62,7 @@ flutter run
 - Day 14: added an `EditTodoScreen` — tapping a todo on the home screen opens it
   prefilled with the title; saving updates the DB via `TodoProvider.updateTodo`
   and refreshes the list. Tested the full edit flow.
+- Day 16: added an optional `dueDate` to the todo model and `todos` table (schema
+  v3 migration) plus a `DueDateField` date picker in the add/edit forms; picked
+  dates are persisted and re-displayed. Tested the model round-trip, the v2→v3
+  migration, and the picker flow in both screens.

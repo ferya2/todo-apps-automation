@@ -51,7 +51,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
 
 - [ ] **Day 15 — Delete todo.** Swipe-to-dismiss removes a todo from DB and list,
   with an undo snackbar. Test deletion.
-- [ ] **Day 16 — Due date.** Add `dueDate` to the model/table (migration to schema
+- [x] **Day 16 — Due date.** Add `dueDate` to the model/table (migration to schema
   v2) + a date picker in the add/edit form. Test model + migration.
 - [ ] **Day 17 — Priority.** Add `priority` (low/medium/high enum) to model/table
   (migration) + a selector in the form + a colored indicator in the list. Test.

@@ -7,6 +7,7 @@ import 'package:todo_app/data/data.dart';
 import 'package:todo_app/providers/providers.dart';
 import 'package:todo_app/screens/add_todo_screen.dart';
 import 'package:todo_app/screens/home_screen.dart';
+import 'package:todo_app/utils/date_format.dart';
 
 /// Wraps [home] in a [ChangeNotifierProvider] backed by [provider] so screens
 /// can read the [TodoProvider] (e.g. AddTodoScreen's Save button).
@@ -68,6 +69,7 @@ void main() {
     expect(find.widgetWithText(AppBar, 'Add Todo'), findsOneWidget);
     expect(find.byType(TextFormField), findsOneWidget);
     expect(find.text('Save'), findsOneWidget);
+    expect(find.text('No due date'), findsOneWidget);
   });
 
   testWidgets('Save with an empty title shows a validation error and stays', (
@@ -129,5 +131,39 @@ void main() {
     final saved = (await dao.getAll()).single;
     expect(saved.title, 'Buy groceries');
     expect(provider.todos.single.title, 'Buy groceries');
+  });
+
+  testWidgets('picking a due date and saving persists it', (tester) async {
+    await provider.loadTodos();
+
+    await tester.pumpWidget(_appWithProvider(provider, const HomeScreen()));
+    await tester.pumpAndSettle();
+
+    // Open the AddTodoScreen via the home FAB.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+    expect(find.byType(AddTodoScreen), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'Pay rent');
+    await tester.pumpAndSettle();
+
+    // Open the date picker and confirm the preselected date (today).
+    await tester.tap(find.text('No due date'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('OK'));
+    await tester.pumpAndSettle();
+
+    final today = DateTime.now();
+    final todayDate = DateTime(today.year, today.month, today.day);
+    expect(find.text(formatDate(todayDate)), findsOneWidget);
+
+    // Save and confirm the due date was persisted.
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AddTodoScreen), findsNothing);
+
+    final saved = (await dao.getAll()).single;
+    expect(saved.title, 'Pay rent');
+    expect(saved.dueDate, todayDate);
   });
 }

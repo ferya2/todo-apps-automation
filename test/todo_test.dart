@@ -22,12 +22,19 @@ void main() {
       expect(todo.id, isNull);
     });
 
+    test('dueDate defaults to null', () {
+      final todo = Todo(title: 'Write tests');
+      expect(todo.dueDate, isNull);
+    });
+
     test('toMap contains the expected fields', () {
       final createdAt = DateTime(2026, 9, 10, 8, 30);
+      final dueDate = DateTime(2026, 9, 20);
       final todo = Todo(
         id: 7,
         title: 'Buy milk',
         isCompleted: true,
+        dueDate: dueDate,
         createdAt: createdAt,
       );
 
@@ -36,30 +43,38 @@ void main() {
         'title': 'Buy milk',
         'isCompleted': 1,
         'createdAt': createdAt.millisecondsSinceEpoch,
+        'dueDate': dueDate.millisecondsSinceEpoch,
       });
     });
 
-    test('toMap serializes an uncompleted todo with isCompleted 0', () {
-      final todo = Todo(title: 'Buy milk');
-      expect(todo.toMap()['isCompleted'], 0);
-    });
+    test(
+      'toMap serializes an uncompleted todo with isCompleted 0 and no due date',
+      () {
+        final todo = Todo(title: 'Buy milk');
+        expect(todo.toMap()['isCompleted'], 0);
+        expect(todo.toMap()['dueDate'], isNull);
+      },
+    );
 
     test('fromMap parses a completed todo', () {
       final createdAt = DateTime(2026, 9, 10, 8, 30);
+      final dueDate = DateTime(2026, 9, 25);
       final todo = Todo.fromMap({
         'id': 3,
         'title': 'Walk the dog',
         'isCompleted': 1,
         'createdAt': createdAt.millisecondsSinceEpoch,
+        'dueDate': dueDate.millisecondsSinceEpoch,
       });
 
       expect(todo.id, 3);
       expect(todo.title, 'Walk the dog');
       expect(todo.isCompleted, isTrue);
+      expect(todo.dueDate, dueDate);
       expect(todo.createdAt, createdAt);
     });
 
-    test('fromMap parses an uncompleted todo', () {
+    test('fromMap parses an uncompleted todo without a due date', () {
       final todo = Todo.fromMap({
         'id': 4,
         'title': 'Walk the dog',
@@ -68,6 +83,7 @@ void main() {
       });
 
       expect(todo.isCompleted, isFalse);
+      expect(todo.dueDate, isNull);
     });
 
     test('round-trips through toMap and fromMap', () {
@@ -75,6 +91,7 @@ void main() {
         id: 42,
         title: 'Ship it',
         isCompleted: true,
+        dueDate: DateTime(2026, 9, 30),
         createdAt: DateTime(2026, 9, 10, 23, 59, 59),
       );
 
@@ -83,6 +100,7 @@ void main() {
       expect(restored.id, original.id);
       expect(restored.title, original.title);
       expect(restored.isCompleted, original.isCompleted);
+      expect(restored.dueDate, original.dueDate);
       expect(restored.createdAt, original.createdAt);
     });
   });

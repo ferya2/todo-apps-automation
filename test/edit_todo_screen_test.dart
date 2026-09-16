@@ -8,6 +8,7 @@ import 'package:todo_app/models/models.dart';
 import 'package:todo_app/providers/providers.dart';
 import 'package:todo_app/screens/edit_todo_screen.dart';
 import 'package:todo_app/screens/home_screen.dart';
+import 'package:todo_app/utils/date_format.dart';
 
 void main() {
   setUpAll(() {
@@ -130,5 +131,35 @@ void main() {
     final saved = await dao.getById(id);
     expect(saved!.title, 'Renamed title');
     expect(provider.todos.single.title, 'Renamed title');
+  });
+
+  testWidgets('pre-fills an existing due date and saves it', (tester) async {
+    final dueDate = DateTime(2026, 9, 20);
+    final id = await dao.insert(
+      Todo(title: 'Original title', dueDate: dueDate),
+    );
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Open the edit screen; the due date field is pre-filled.
+    await tester.tap(find.widgetWithText(ListTile, 'Original title'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditTodoScreen), findsOneWidget);
+    expect(find.text(formatDate(dueDate)), findsOneWidget);
+
+    // Save without changing anything; the due date is preserved.
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditTodoScreen), findsNothing);
+
+    final saved = await dao.getById(id);
+    expect(saved!.dueDate, dueDate);
   });
 }
