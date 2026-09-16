@@ -3,13 +3,15 @@ import 'package:provider/provider.dart';
 
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/providers/todo_provider.dart';
+import 'package:todo_app/widgets/due_date_field.dart';
 
-/// A screen for editing an existing todo's title.
+/// A screen for editing an existing todo's title and due date.
 ///
-/// Pre-fills the title field with [Todo.title]. The title field is validated:
-/// pressing Save with an empty title shows an error and keeps the screen open.
-/// When the title is valid, the todo is persisted via [TodoProvider] and this
-/// screen pops back to the previous route.
+/// Pre-fills the title field with [Todo.title] and the due date field with
+/// [Todo.dueDate]. The title field is validated: pressing Save with an empty
+/// title shows an error and keeps the screen open. When the title is valid, the
+/// todo is persisted via [TodoProvider] and this screen pops back to the
+/// previous route.
 class EditTodoScreen extends StatefulWidget {
   const EditTodoScreen({super.key, required this.todo});
 
@@ -25,6 +27,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
   late final TextEditingController _titleController = TextEditingController(
     text: widget.todo.title,
   );
+  late DateTime? _dueDate = widget.todo.dueDate;
 
   @override
   void dispose() {
@@ -41,6 +44,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
       id: widget.todo.id,
       title: _titleController.text.trim(),
       isCompleted: widget.todo.isCompleted,
+      dueDate: _dueDate,
       createdAt: widget.todo.createdAt,
     );
     context.read<TodoProvider>().updateTodo(todo);
@@ -66,21 +70,30 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
         padding: const EdgeInsets.all(16),
         child: Form(
           key: _formKey,
-          child: TextFormField(
-            controller: _titleController,
-            decoration: const InputDecoration(
-              labelText: 'Title',
-              hintText: 'What needs to be done?',
-              border: OutlineInputBorder(),
-            ),
-            validator: (value) {
-              if (value == null || value.trim().isEmpty) {
-                return 'Please enter a title';
-              }
-              return null;
-            },
-            autofocus: true,
-            textInputAction: TextInputAction.done,
+          child: Column(
+            children: [
+              TextFormField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'What needs to be done?',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
+                autofocus: true,
+                textInputAction: TextInputAction.done,
+              ),
+              const SizedBox(height: 16),
+              DueDateField(
+                dueDate: _dueDate,
+                onChanged: (date) => setState(() => _dueDate = date),
+              ),
+            ],
           ),
         ),
       ),

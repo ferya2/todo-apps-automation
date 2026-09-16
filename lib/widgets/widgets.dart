@@ -1,4 +1,5 @@
 // Reusable UI components used across screens.
 //
-// This is a placeholder barrel file. Concrete widget files will be added
-// incrementally per the roadmap.
+// Concrete widget files are added incrementally per the roadmap.
+
+export 'due_date_field.dart';

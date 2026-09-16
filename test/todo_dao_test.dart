@@ -32,7 +32,11 @@ void main() {
     });
 
     test('insert persists the row with its fields', () async {
-      final todo = Todo(title: 'Walk the dog', isCompleted: false);
+      final todo = Todo(
+        title: 'Walk the dog',
+        isCompleted: false,
+        dueDate: DateTime(2026, 9, 25),
+      );
       final id = await dao.insert(todo);
 
       final db = await helper.database;
@@ -40,10 +44,15 @@ void main() {
       expect(rows.length, 1);
       expect(rows.first['title'], 'Walk the dog');
       expect(rows.first['isCompleted'], 0);
+      expect(rows.first['dueDate'], todo.dueDate!.millisecondsSinceEpoch);
     });
 
     test('getById returns the inserted todo', () async {
-      final todo = Todo(title: 'Buy milk', isCompleted: true);
+      final todo = Todo(
+        title: 'Buy milk',
+        isCompleted: true,
+        dueDate: DateTime(2026, 9, 30),
+      );
       final id = await dao.insert(todo);
 
       final saved = await dao.getById(id);
@@ -51,6 +60,7 @@ void main() {
       expect(saved!.id, id);
       expect(saved.title, 'Buy milk');
       expect(saved.isCompleted, true);
+      expect(saved.dueDate, todo.dueDate);
       expect(
         saved.createdAt.millisecondsSinceEpoch,
         todo.createdAt.millisecondsSinceEpoch,
@@ -85,6 +95,7 @@ void main() {
           id: saved.id,
           title: 'Updated title',
           isCompleted: true,
+          dueDate: DateTime(2026, 10, 1),
           createdAt: saved.createdAt,
         );
         final changed = await dao.update(updated);
@@ -93,6 +104,7 @@ void main() {
         final fetched = await dao.getById(id);
         expect(fetched!.title, 'Updated title');
         expect(fetched.isCompleted, true);
+        expect(fetched.dueDate, DateTime(2026, 10, 1));
       });
 
       test('returns 0 when updating a non-existent id', () async {

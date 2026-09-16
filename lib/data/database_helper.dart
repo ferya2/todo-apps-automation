@@ -3,9 +3,10 @@ import 'package:sqflite/sqflite.dart';
 
 /// Opens and manages the app's SQLite database.
 ///
-/// Schema version 2. Version 1 created the database with no tables; version 2
-/// adds the `todos` table (see [onUpgrade]). All schema changes happen through
-/// [DatabaseHelper.onUpgrade] so existing user data is never dropped.
+/// Schema version 3. Version 1 created the database with no tables; version 2
+/// adds the `todos` table; version 3 adds the `dueDate` column (see
+/// [onUpgrade]). All schema changes happen through [DatabaseHelper.onUpgrade]
+/// so existing user data is never dropped.
 ///
 /// [databaseFactory] and [databasePath] are optional constructor parameters
 /// that allow tests to substitute [sqflite_common_ffi]'s in-memory factory.
@@ -25,7 +26,7 @@ class DatabaseHelper {
 
   /// The schema version. Bump this (and add migration logic in [onUpgrade])
   /// whenever the schema changes.
-  static const int schemaVersion = 2;
+  static const int schemaVersion = 3;
 
   final DatabaseFactory? _databaseFactory;
   final String? _databasePath;
@@ -56,6 +57,7 @@ class DatabaseHelper {
   ///
   /// - v1: database created, no tables.
   /// - v2: adds the `todos` table.
+  /// - v3: adds the nullable `dueDate` column to `todos`.
   Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute('''
@@ -66,6 +68,9 @@ class DatabaseHelper {
           createdAt INTEGER NOT NULL
         )
       ''');
+    }
+    if (oldVersion < 3) {
+      await db.execute('ALTER TABLE todos ADD COLUMN dueDate INTEGER');
     }
   }
 
