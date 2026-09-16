@@ -175,5 +175,43 @@ void main() {
 
       expect(notified, isTrue);
     });
+
+    test('deleteTodo removes the todo from the DAO and list', () async {
+      final id = await dao.insert(Todo(title: 'To delete'));
+      await provider.loadTodos();
+
+      expect(provider.todos, isNotEmpty);
+
+      await provider.deleteTodo(provider.todos.single);
+
+      expect(provider.todos, isEmpty);
+      expect(await dao.getById(id), isNull);
+    });
+
+    test('deleteTodo does not affect other todos', () async {
+      final id1 = await dao.insert(Todo(title: 'First'));
+      final id2 = await dao.insert(Todo(title: 'Second'));
+      await provider.loadTodos();
+
+      await provider.deleteTodo(provider.todos.singleWhere((t) => t.id == id1));
+
+      expect(provider.todos.map((t) => t.id), [id2]);
+      expect(await dao.getById(id1), isNull);
+      expect(await dao.getById(id2), isNotNull);
+    });
+
+    test('deleteTodo notifies listeners', () async {
+      await dao.insert(Todo(title: 'To delete'));
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.deleteTodo(provider.todos.single);
+
+      expect(notified, isTrue);
+    });
   });
 }

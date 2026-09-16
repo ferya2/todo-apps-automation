@@ -62,3 +62,8 @@ flutter run
 - Day 14: added an `EditTodoScreen` — tapping a todo on the home screen opens it
   prefilled with the title; saving updates the DB via `TodoProvider.updateTodo`
   and refreshes the list. Tested the full edit flow.
+- Day 15: added `TodoProvider.deleteTodo` and swipe-to-dismiss on the home screen
+  list items (end-to-start), backed by `TodoDao.delete`; dismissing a todo removes
+  it from the DB and list and shows a snackbar with an Undo action that re-inserts
+  it. Tested the provider method (removal, no-effect-on-others, listener notify)
+  and the swipe-to-dismiss / undo snackbar flow.
