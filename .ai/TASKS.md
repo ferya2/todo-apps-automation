@@ -53,7 +53,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   with an undo snackbar. Test deletion.
 - [x] **Day 16 — Due date.** Add `dueDate` to the model/table (migration to schema
   v2) + a date picker in the add/edit form. Test model + migration.
-- [ ] **Day 17 — Priority.** Add `priority` (low/medium/high enum) to model/table
+- [x] **Day 17 — Priority.** Add `priority` (low/medium/high enum) to model/table
   (migration) + a selector in the form + a colored indicator in the list. Test.
 - [ ] **Day 18 — Category model + table.** Add `Category` model and `categories`
   table (migration) + `CategoryDao` (insert/getAll). Unit test the DAO.

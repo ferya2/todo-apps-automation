@@ -7,6 +7,7 @@ import 'package:todo_app/data/data.dart';
 import 'package:todo_app/models/models.dart';
 import 'package:todo_app/providers/providers.dart';
 import 'package:todo_app/screens/home_screen.dart';
+import 'package:todo_app/widgets/priority_indicator.dart';
 
 void main() {
   setUpAll(() {
@@ -73,5 +74,33 @@ void main() {
     final saved = await dao.getById(id);
     expect(saved!.isCompleted, isTrue);
     expect(provider.todos.single.isCompleted, isTrue);
+  });
+
+  testWidgets('shows a colored priority indicator for each todo', (
+    tester,
+  ) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+    final dao = TodoDao(helper);
+    final provider = TodoProvider(dao);
+    addTearDown(helper.close);
+
+    await dao.insert(Todo(title: 'Low task', priority: TodoPriority.low));
+    await dao.insert(Todo(title: 'High task', priority: TodoPriority.high));
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PriorityIndicator), findsNWidgets(2));
+    expect(find.byTooltip('Low priority'), findsOneWidget);
+    expect(find.byTooltip('High priority'), findsOneWidget);
   });
 }

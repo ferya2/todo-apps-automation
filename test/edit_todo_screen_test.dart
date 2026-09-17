@@ -162,4 +162,39 @@ void main() {
     final saved = await dao.getById(id);
     expect(saved!.dueDate, dueDate);
   });
+
+  testWidgets('pre-fills an existing priority and saves a change', (
+    tester,
+  ) async {
+    final id = await dao.insert(
+      Todo(title: 'Original title', priority: TodoPriority.high),
+    );
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Open the edit screen; the priority selector is pre-filled with High.
+    await tester.tap(find.widgetWithText(ListTile, 'Original title'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditTodoScreen), findsOneWidget);
+    expect(find.text('High'), findsOneWidget);
+
+    // Change the priority to Low and save.
+    await tester.tap(find.text('High'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Low').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditTodoScreen), findsNothing);
+
+    final saved = await dao.getById(id);
+    expect(saved!.priority, TodoPriority.low);
+  });
 }

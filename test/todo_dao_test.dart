@@ -36,6 +36,7 @@ void main() {
         title: 'Walk the dog',
         isCompleted: false,
         dueDate: DateTime(2026, 9, 25),
+        priority: TodoPriority.high,
       );
       final id = await dao.insert(todo);
 
@@ -45,6 +46,7 @@ void main() {
       expect(rows.first['title'], 'Walk the dog');
       expect(rows.first['isCompleted'], 0);
       expect(rows.first['dueDate'], todo.dueDate!.millisecondsSinceEpoch);
+      expect(rows.first['priority'], 'high');
     });
 
     test('getById returns the inserted todo', () async {
@@ -52,6 +54,7 @@ void main() {
         title: 'Buy milk',
         isCompleted: true,
         dueDate: DateTime(2026, 9, 30),
+        priority: TodoPriority.low,
       );
       final id = await dao.insert(todo);
 
@@ -61,6 +64,7 @@ void main() {
       expect(saved.title, 'Buy milk');
       expect(saved.isCompleted, true);
       expect(saved.dueDate, todo.dueDate);
+      expect(saved.priority, TodoPriority.low);
       expect(
         saved.createdAt.millisecondsSinceEpoch,
         todo.createdAt.millisecondsSinceEpoch,
@@ -96,6 +100,7 @@ void main() {
           title: 'Updated title',
           isCompleted: true,
           dueDate: DateTime(2026, 10, 1),
+          priority: TodoPriority.high,
           createdAt: saved.createdAt,
         );
         final changed = await dao.update(updated);
@@ -105,6 +110,7 @@ void main() {
         expect(fetched!.title, 'Updated title');
         expect(fetched.isCompleted, true);
         expect(fetched.dueDate, DateTime(2026, 10, 1));
+        expect(fetched.priority, TodoPriority.high);
       });
 
       test('returns 0 when updating a non-existent id', () async {

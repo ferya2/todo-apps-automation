@@ -29,7 +29,7 @@ level. Tick a box when the whole feature is done.
 ## Phase 3 — Features (Week 3)
 
 - [x] Due date + date picker
-- [ ] Priority (low / medium / high)
+- [x] Priority (low / medium / high)
 - [ ] `Category` model + table + DAO
 - [ ] Assign category to a todo (UI)
 - [ ] Filter by status (all / active / completed)

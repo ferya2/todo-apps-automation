@@ -1,3 +1,17 @@
+/// How urgent a todo is.
+///
+/// Stored in SQLite as the enum's [TodoPriority.name] (a text column).
+enum TodoPriority {
+  low('Low'),
+  medium('Medium'),
+  high('High');
+
+  const TodoPriority(this.label);
+
+  /// A human-readable, capitalized label for display in the UI.
+  final String label;
+}
+
 /// A single todo item.
 ///
 /// Pure Dart (no Flutter imports) so it is easy to unit test. [id] is null
@@ -9,6 +23,7 @@ class Todo {
     required this.title,
     this.isCompleted = false,
     this.dueDate,
+    this.priority = TodoPriority.medium,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -24,6 +39,9 @@ class Todo {
   /// When the todo should be completed by, or null when there is no deadline.
   final DateTime? dueDate;
 
+  /// How urgent the todo is.
+  final TodoPriority priority;
+
   /// When the todo was created.
   final DateTime createdAt;
 
@@ -36,6 +54,7 @@ class Todo {
       'isCompleted': isCompleted ? 1 : 0,
       'createdAt': createdAt.millisecondsSinceEpoch,
       'dueDate': dueDate?.millisecondsSinceEpoch,
+      'priority': priority.name,
     };
   }
 
@@ -48,6 +67,9 @@ class Todo {
       dueDate: map['dueDate'] == null
           ? null
           : DateTime.fromMillisecondsSinceEpoch(map['dueDate'] as int),
+      priority: map['priority'] is String
+          ? TodoPriority.values.byName(map['priority'] as String)
+          : TodoPriority.medium,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
     );
   }
