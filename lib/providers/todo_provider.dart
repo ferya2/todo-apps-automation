@@ -58,4 +58,33 @@ class TodoProvider extends ChangeNotifier {
     await dao.update(todo);
     await loadTodos();
   }
+
+  /// The most recently deleted todo, retained so it can be restored via
+  /// [undoDelete] when the user taps the snackbar's Undo action.
+  Todo? _recentlyDeleted;
+
+  /// Deletes [todo] from the DAO and reloads the list from the database.
+  /// The deleted todo is retained (in [_recentlyDeleted]) so it can be
+  /// restored via [undoDelete].
+  ///
+  /// Notifies listeners once the deletion and reload complete.
+  Future<void> deleteTodo(Todo todo) async {
+    _recentlyDeleted = todo;
+    await dao.delete(todo.id!);
+    await loadTodos();
+  }
+
+  /// Re-inserts the most recently deleted todo (if any) and reloads the list.
+  /// A no-op when there is nothing to undo (e.g. no deletion has happened or
+  /// the snackbar already expired).
+  ///
+  /// Notifies listeners once the re-insert and reload complete, or is a
+  /// silent no-op when there is nothing to undo.
+  Future<void> undoDelete() async {
+    final todo = _recentlyDeleted;
+    if (todo == null) return;
+    _recentlyDeleted = null;
+    await dao.insert(todo);
+    await loadTodos();
+  }
 }

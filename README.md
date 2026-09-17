@@ -62,6 +62,9 @@ flutter run
 - Day 14: added an `EditTodoScreen` — tapping a todo on the home screen opens it
   prefilled with the title; saving updates the DB via `TodoProvider.updateTodo`
   and refreshes the list. Tested the full edit flow.
+- Day 15: added swipe-to-dismiss delete on the home list with an undo snackbar;
+  wired `TodoProvider.deleteTodo`/`undoDelete` to the DAO and added unit + widget
+  tests.
 - Day 16: added an optional `dueDate` to the todo model and `todos` table (schema
   v3 migration) plus a `DueDateField` date picker in the add/edit forms; picked
   dates are persisted and re-displayed. Tested the model round-trip, the v2→v3
