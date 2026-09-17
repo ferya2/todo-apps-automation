@@ -175,5 +175,57 @@ void main() {
 
       expect(notified, isTrue);
     });
+
+    test('deleteTodo removes the todo from the list and the DB', () async {
+      final id = await dao.insert(Todo(title: 'To be deleted'));
+      await provider.loadTodos();
+
+      await provider.deleteTodo(provider.todos.single);
+
+      expect(provider.todos, isEmpty);
+      expect(await dao.getById(id), isNull);
+    });
+
+    test('deleteTodo notifies listeners', () async {
+      await dao.insert(Todo(title: 'Task'));
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.deleteTodo(provider.todos.single);
+
+      expect(notified, isTrue);
+    });
+
+    test('undoDelete re-inserts the most recently deleted todo', () async {
+      final id = await dao.insert(Todo(title: 'To be undone'));
+      await provider.loadTodos();
+
+      await provider.deleteTodo(provider.todos.single);
+      expect(provider.todos, isEmpty);
+      expect(await dao.getById(id), isNull);
+
+      await provider.undoDelete();
+
+      expect(provider.todos, isNotEmpty);
+      expect(provider.todos.single.title, 'To be undone');
+    });
+
+    test('undoDelete is a no-op when there is nothing to undo', () async {
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.undoDelete();
+
+      expect(provider.todos, isEmpty);
+      expect(notified, isFalse);
+    });
   });
 }

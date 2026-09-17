@@ -49,7 +49,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
 
 ## Week 3 — Features
 
-- [ ] **Day 15 — Delete todo.** Swipe-to-dismiss removes a todo from DB and list,
+- [x] **Day 15 — Delete todo.** Swipe-to-dismiss removes a todo from DB and list,
   with an undo snackbar. Test deletion.
 - [x] **Day 16 — Due date.** Add `dueDate` to the model/table (migration to schema
   v2) + a date picker in the add/edit form. Test model + migration.

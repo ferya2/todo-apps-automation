@@ -24,7 +24,7 @@ level. Tick a box when the whole feature is done.
 - [x] Save new todo to DB
 - [x] Toggle "completed" state
 - [x] Edit todo
-- [ ] Delete todo (swipe to dismiss)
+- [x] Delete todo (swipe to dismiss)
 
 ## Phase 3 — Features (Week 3)
 
