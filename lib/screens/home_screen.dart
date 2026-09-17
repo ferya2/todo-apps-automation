@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/providers/todo_provider.dart';
 import 'package:todo_app/screens/add_todo_screen.dart';
 import 'package:todo_app/screens/edit_todo_screen.dart';
+import 'package:todo_app/widgets/priority_indicator.dart';
 
 /// The home screen for the Todo app.
 ///
@@ -41,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemBuilder: (context, index) {
                 final todo = todos[index];
                 return ListTile(
+                  leading: PriorityIndicator(priority: todo.priority),
                   title: Text(todo.title),
                   trailing: Checkbox(
                     value: todo.isCompleted,

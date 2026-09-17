@@ -66,3 +66,7 @@ flutter run
   v3 migration) plus a `DueDateField` date picker in the add/edit forms; picked
   dates are persisted and re-displayed. Tested the model round-trip, the v2→v3
   migration, and the picker flow in both screens.
+- Day 17: added `priority` (low/medium/high enum) to the todo model and `todos`
+  table (schema v4 migration) plus a `PriorityField` selector in the add/edit
+  forms and a colored `PriorityIndicator` dot in the list. Tested the model +
+  DAO round-trip, the v3→v4 migration, and the selector/indicator widgets.

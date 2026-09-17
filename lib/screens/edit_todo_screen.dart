@@ -4,14 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/providers/todo_provider.dart';
 import 'package:todo_app/widgets/due_date_field.dart';
+import 'package:todo_app/widgets/priority_field.dart';
 
-/// A screen for editing an existing todo's title and due date.
+/// A screen for editing an existing todo's title, due date, and priority.
 ///
-/// Pre-fills the title field with [Todo.title] and the due date field with
-/// [Todo.dueDate]. The title field is validated: pressing Save with an empty
-/// title shows an error and keeps the screen open. When the title is valid, the
-/// todo is persisted via [TodoProvider] and this screen pops back to the
-/// previous route.
+/// Pre-fills the title field with [Todo.title], the due date field with
+/// [Todo.dueDate], and the priority selector with [Todo.priority]. The title
+/// field is validated: pressing Save with an empty title shows an error and
+/// keeps the screen open. When the title is valid, the todo is persisted via
+/// [TodoProvider] and this screen pops back to the previous route.
 class EditTodoScreen extends StatefulWidget {
   const EditTodoScreen({super.key, required this.todo});
 
@@ -28,6 +29,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
     text: widget.todo.title,
   );
   late DateTime? _dueDate = widget.todo.dueDate;
+  late TodoPriority _priority = widget.todo.priority;
 
   @override
   void dispose() {
@@ -45,6 +47,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
       title: _titleController.text.trim(),
       isCompleted: widget.todo.isCompleted,
       dueDate: _dueDate,
+      priority: _priority,
       createdAt: widget.todo.createdAt,
     );
     context.read<TodoProvider>().updateTodo(todo);
@@ -92,6 +95,11 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
               DueDateField(
                 dueDate: _dueDate,
                 onChanged: (date) => setState(() => _dueDate = date),
+              ),
+              const SizedBox(height: 16),
+              PriorityField(
+                priority: _priority,
+                onChanged: (priority) => setState(() => _priority = priority),
               ),
             ],
           ),

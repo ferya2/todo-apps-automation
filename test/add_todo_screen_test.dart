@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import 'package:todo_app/data/data.dart';
+import 'package:todo_app/models/models.dart';
 import 'package:todo_app/providers/providers.dart';
 import 'package:todo_app/screens/add_todo_screen.dart';
 import 'package:todo_app/screens/home_screen.dart';
@@ -70,6 +71,8 @@ void main() {
     expect(find.byType(TextFormField), findsOneWidget);
     expect(find.text('Save'), findsOneWidget);
     expect(find.text('No due date'), findsOneWidget);
+    expect(find.text('Priority'), findsOneWidget);
+    expect(find.text('Medium'), findsOneWidget);
   });
 
   testWidgets('Save with an empty title shows a validation error and stays', (
@@ -165,5 +168,33 @@ void main() {
     final saved = (await dao.getAll()).single;
     expect(saved.title, 'Pay rent');
     expect(saved.dueDate, todayDate);
+  });
+
+  testWidgets('picking a priority and saving persists it', (tester) async {
+    await provider.loadTodos();
+
+    await tester.pumpWidget(_appWithProvider(provider, const HomeScreen()));
+    await tester.pumpAndSettle();
+
+    // Open the AddTodoScreen via the home FAB.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextFormField), 'Urgent task');
+    await tester.pumpAndSettle();
+
+    // Open the priority dropdown and choose High.
+    await tester.tap(find.text('Medium'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('High').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AddTodoScreen), findsNothing);
+
+    final saved = (await dao.getAll()).single;
+    expect(saved.title, 'Urgent task');
+    expect(saved.priority, TodoPriority.high);
   });
 }

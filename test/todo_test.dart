@@ -27,6 +27,11 @@ void main() {
       expect(todo.dueDate, isNull);
     });
 
+    test('priority defaults to medium', () {
+      final todo = Todo(title: 'Write tests');
+      expect(todo.priority, TodoPriority.medium);
+    });
+
     test('toMap contains the expected fields', () {
       final createdAt = DateTime(2026, 9, 10, 8, 30);
       final dueDate = DateTime(2026, 9, 20);
@@ -35,6 +40,7 @@ void main() {
         title: 'Buy milk',
         isCompleted: true,
         dueDate: dueDate,
+        priority: TodoPriority.high,
         createdAt: createdAt,
       );
 
@@ -44,7 +50,13 @@ void main() {
         'isCompleted': 1,
         'createdAt': createdAt.millisecondsSinceEpoch,
         'dueDate': dueDate.millisecondsSinceEpoch,
+        'priority': 'high',
       });
+    });
+
+    test('toMap serializes priority as its enum name', () {
+      final todo = Todo(title: 'Buy milk');
+      expect(todo.toMap()['priority'], 'medium');
     });
 
     test(
@@ -65,13 +77,26 @@ void main() {
         'isCompleted': 1,
         'createdAt': createdAt.millisecondsSinceEpoch,
         'dueDate': dueDate.millisecondsSinceEpoch,
+        'priority': 'low',
       });
 
       expect(todo.id, 3);
       expect(todo.title, 'Walk the dog');
       expect(todo.isCompleted, isTrue);
       expect(todo.dueDate, dueDate);
+      expect(todo.priority, TodoPriority.low);
       expect(todo.createdAt, createdAt);
+    });
+
+    test('fromMap defaults priority to medium when the column is missing', () {
+      final todo = Todo.fromMap({
+        'id': 4,
+        'title': 'Walk the dog',
+        'isCompleted': 0,
+        'createdAt': 0,
+      });
+
+      expect(todo.priority, TodoPriority.medium);
     });
 
     test('fromMap parses an uncompleted todo without a due date', () {
@@ -92,6 +117,7 @@ void main() {
         title: 'Ship it',
         isCompleted: true,
         dueDate: DateTime(2026, 9, 30),
+        priority: TodoPriority.high,
         createdAt: DateTime(2026, 9, 10, 23, 59, 59),
       );
 
@@ -101,6 +127,7 @@ void main() {
       expect(restored.title, original.title);
       expect(restored.isCompleted, original.isCompleted);
       expect(restored.dueDate, original.dueDate);
+      expect(restored.priority, original.priority);
       expect(restored.createdAt, original.createdAt);
     });
   });
