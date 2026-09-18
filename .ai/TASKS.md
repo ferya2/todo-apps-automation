@@ -27,7 +27,6 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   Unit test round-trip (insert then read).
 - [x] **Day 07 — update & delete DAO.** Added `TodoDao.update(todo)` and
   `TodoDao.delete(id)` with unit tests.
-
 ## Week 2 — Core UI
 
 - [x] **Day 08 — Theme + home scaffold.** App theme (colors, typography) and a
@@ -55,7 +54,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   v2) + a date picker in the add/edit form. Test model + migration.
 - [x] **Day 17 — Priority.** Add `priority` (low/medium/high enum) to model/table
   (migration) + a selector in the form + a colored indicator in the list. Test.
-- [ ] **Day 18 — Category model + table.** Add `Category` model and `categories`
+- [x] **Day 18 — Category model + table.** Add `Category` model and `categories`
   table (migration) + `CategoryDao` (insert/getAll). Unit test the DAO.
 - [ ] **Day 19 — Assign category.** Add `categoryId` to todos (migration) + a
   category dropdown in the form. Show the category name on the list item. Test.
