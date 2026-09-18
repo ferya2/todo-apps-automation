@@ -41,22 +41,47 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 final todo = todos[index];
-                return ListTile(
-                  leading: PriorityIndicator(priority: todo.priority),
-                  title: Text(todo.title),
-                  trailing: Checkbox(
-                    value: todo.isCompleted,
-                    onChanged: (_) {
-                      context.read<TodoProvider>().toggleCompleted(todo);
-                    },
+                return Dismissible(
+                  key: ValueKey(todo.id),
+                  background: Container(
+                    color: Theme.of(context).colorScheme.error,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: const Icon(Icons.delete, color: Colors.white),
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => EditTodoScreen(todo: todo),
+                  onDismissed: (direction) async {
+                    final deleted = todo;
+                    final provider = context.read<TodoProvider>();
+                    final messenger = ScaffoldMessenger.of(context);
+                    await provider.deleteTodo(todo);
+                    if (!mounted) return;
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text('${deleted.title} deleted'),
+                        action: SnackBarAction(
+                          label: 'Undo',
+                          onPressed: provider.undoDelete,
+                        ),
                       ),
                     );
                   },
+                  child: ListTile(
+                    leading: PriorityIndicator(priority: todo.priority),
+                    title: Text(todo.title),
+                    trailing: Checkbox(
+                      value: todo.isCompleted,
+                      onChanged: (_) {
+                        context.read<TodoProvider>().toggleCompleted(todo);
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => EditTodoScreen(todo: todo),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),

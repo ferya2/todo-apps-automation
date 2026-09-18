@@ -20,6 +20,10 @@ class TodoProvider extends ChangeNotifier {
 
   List<Todo> _todos = [];
 
+  /// The todo most recently removed by [deleteTodo], retained so
+  /// [undoDelete] can restore it.
+  Todo? _lastDeleted;
+
   /// The current list of todos (read-only view).
   List<Todo> get todos => List.unmodifiable(_todos);
 
@@ -56,6 +60,32 @@ class TodoProvider extends ChangeNotifier {
   Future<void> toggleCompleted(Todo todo) async {
     todo.isCompleted = !todo.isCompleted;
     await dao.update(todo);
+    await loadTodos();
+  }
+
+  /// Deletes [todo] from the database and reloads the list so the UI
+  /// reflects the removal.
+  ///
+  /// The deleted todo is retained so [undoDelete] can restore it. Notifies
+  /// listeners once the delete and reload complete.
+  Future<void> deleteTodo(Todo todo) async {
+    _lastDeleted = todo;
+    if (todo.id != null) {
+      await dao.delete(todo.id!);
+    }
+    await loadTodos();
+  }
+
+  /// Re-inserts the todo removed by the most recent [deleteTodo] call and
+  /// reloads the list so the UI reflects the restoration.
+  ///
+  /// A no-op when there is nothing to undo. Notifies listeners once the
+  /// re-insert and reload complete.
+  Future<void> undoDelete() async {
+    final todo = _lastDeleted;
+    if (todo == null) return;
+    await dao.insert(todo);
+    _lastDeleted = null;
     await loadTodos();
   }
 }
