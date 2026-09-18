@@ -70,3 +70,6 @@ flutter run
   table (schema v4 migration) plus a `PriorityField` selector in the add/edit
   forms and a colored `PriorityIndicator` dot in the list. Tested the model +
   DAO round-trip, the v3→v4 migration, and the selector/indicator widgets.
+- Day 18: added a `Category` model and `categories` table (schema v5 migration)
+  plus a `CategoryDao` (`insert` / `getAll`); unit-tested the model, the DAO,
+  and the v4→v5 migration.

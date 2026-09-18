@@ -30,7 +30,7 @@ level. Tick a box when the whole feature is done.
 
 - [x] Due date + date picker
 - [x] Priority (low / medium / high)
-- [ ] `Category` model + table + DAO
+- [x] `Category` model + table + DAO
 - [ ] Assign category to a todo (UI)
 - [ ] Filter by status (all / active / completed)
 - [ ] Filter by category
