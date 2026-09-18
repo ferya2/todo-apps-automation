@@ -175,5 +175,68 @@ void main() {
 
       expect(notified, isTrue);
     });
+
+    group('deleteTodo', () {
+      test('deletes the todo from the DAO and reloads the list', () async {
+        final id = await dao.insert(Todo(title: 'To delete'));
+        await provider.loadTodos();
+        expect(provider.todos, isNotEmpty);
+
+        await provider.deleteTodo(provider.todos.single);
+
+        expect(provider.todos, isEmpty);
+        expect(await dao.getById(id), isNull);
+      });
+
+      test('is a no-op when the todo has no id', () async {
+        final todo = Todo(title: 'Unsaved');
+        await provider.loadTodos();
+
+        await provider.deleteTodo(todo);
+
+        expect(provider.todos, isEmpty);
+      });
+
+      test('notifies listeners', () async {
+        final id = await dao.insert(Todo(title: 'To delete'));
+        await provider.loadTodos();
+
+        var notified = false;
+        provider.addListener(() {
+          notified = true;
+        });
+
+        await provider.deleteTodo(provider.todos.single);
+
+        expect(notified, isTrue);
+        // the deleted id should no longer exist
+        expect(await dao.getById(id), isNull);
+      });
+    });
+
+    group('undoDelete', () {
+      test('re-inserts the deleted todo and reloads the list', () async {
+        final id = await dao.insert(Todo(title: 'To delete'));
+        await provider.loadTodos();
+
+        await provider.deleteTodo(provider.todos.single);
+        expect(provider.todos, isEmpty);
+
+        await provider.undoDelete();
+
+        expect(provider.todos, isNotEmpty);
+        expect(provider.todos.single.title, 'To delete');
+        expect(await dao.getById(id), isNull);
+        expect((await dao.getAll()).any((t) => t.title == 'To delete'), isTrue);
+      });
+
+      test('is a no-op when there is nothing to undo', () async {
+        await provider.loadTodos();
+
+        await provider.undoDelete();
+
+        expect(provider.todos, isEmpty);
+      });
+    });
   });
 }

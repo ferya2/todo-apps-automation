@@ -103,4 +103,74 @@ void main() {
     expect(find.byTooltip('Low priority'), findsOneWidget);
     expect(find.byTooltip('High priority'), findsOneWidget);
   });
+
+  testWidgets('swipe to dismiss deletes the todo from the DB and list', (
+    tester,
+  ) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+    final dao = TodoDao(helper);
+    final provider = TodoProvider(dao);
+    addTearDown(helper.close);
+
+    final id = await dao.insert(Todo(title: 'Swipe me'));
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Swipe me'), findsOneWidget);
+
+    // Swipe the Dismissible far to the left to trigger dismissal.
+    await tester.drag(find.byType(Dismissible).first, const Offset(-1000, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Swipe me'), findsNothing);
+    expect(await dao.getById(id), isNull);
+  });
+
+  testWidgets('undo snackbar restores a dismissed todo', (tester) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+    final dao = TodoDao(helper);
+    final provider = TodoProvider(dao);
+    addTearDown(helper.close);
+
+    final id = await dao.insert(Todo(title: 'Swipe me'));
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Dismiss the todo.
+    await tester.drag(find.byType(Dismissible).first, const Offset(-1000, 0));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Swipe me'), findsNothing);
+    expect(await dao.getById(id), isNull);
+
+    // The undo snackbar should be visible.
+    expect(find.text('Undo'), findsOneWidget);
+
+    await tester.tap(find.text('Undo'));
+    await tester.pumpAndSettle();
+
+    // The todo is back in the list and the database.
+    expect(find.text('Swipe me'), findsOneWidget);
+    expect((await dao.getAll()).any((t) => t.title == 'Swipe me'), isTrue);
+  });
 }
