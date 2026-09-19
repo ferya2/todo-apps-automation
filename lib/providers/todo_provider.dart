@@ -58,4 +58,13 @@ class TodoProvider extends ChangeNotifier {
     await dao.update(todo);
     await loadTodos();
   }
+
+  /// Deletes [todo] from the database and reloads the list so the UI reflects
+  /// the removal.
+  ///
+  /// Notifies listeners once the delete and reload complete.
+  Future<void> deleteTodo(Todo todo) async {
+    await dao.delete(todo.id!);
+    await loadTodos();
+  }
 }

@@ -103,4 +103,53 @@ void main() {
     expect(find.byTooltip('Low priority'), findsOneWidget);
     expect(find.byTooltip('High priority'), findsOneWidget);
   });
+
+  testWidgets('swipe-to-dismiss deletes a todo and shows an undo snackbar', (
+    tester,
+  ) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+    final dao = TodoDao(helper);
+    final provider = TodoProvider(dao);
+    addTearDown(helper.close);
+
+    await dao.insert(Todo(title: 'Task to delete'));
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(ListTile, 'Task to delete'), findsOneWidget);
+
+    // Swipe the item off to the left (end-to-start dismiss).
+    await tester.drag(
+      find.widgetWithText(ListTile, 'Task to delete'),
+      const Offset(-800, 0),
+    );
+    await tester.pumpAndSettle();
+
+    // The todo is gone from the list and the database.
+    expect(find.text('Task to delete'), findsNothing);
+    expect(await dao.getAll(), isEmpty);
+
+    // An undo snackbar is shown.
+    expect(find.textContaining('deleted'), findsOneWidget);
+    expect(find.widgetWithText(SnackBarAction, 'UNDO'), findsOneWidget);
+
+    // Tapping UNDO restores the todo.
+    await tester.tap(find.widgetWithText(SnackBarAction, 'UNDO'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Task to delete'), findsOneWidget);
+    final restored = await dao.getAll();
+    expect(restored, isNotEmpty);
+    expect(restored.single.title, 'Task to delete');
+  });
 }

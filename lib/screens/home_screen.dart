@@ -41,22 +41,53 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 final todo = todos[index];
-                return ListTile(
-                  leading: PriorityIndicator(priority: todo.priority),
-                  title: Text(todo.title),
-                  trailing: Checkbox(
-                    value: todo.isCompleted,
-                    onChanged: (_) {
-                      context.read<TodoProvider>().toggleCompleted(todo);
-                    },
+                return Dismissible(
+                  key: ValueKey<int>(todo.id!),
+                  direction: DismissDirection.endToStart,
+                  background: Container(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    alignment: Alignment.centerRight,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Icon(
+                      Icons.delete,
+                      color: Theme.of(context).colorScheme.onErrorContainer,
+                    ),
                   ),
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => EditTodoScreen(todo: todo),
+                  onDismissed: (direction) async {
+                    final provider = context.read<TodoProvider>();
+                    final messenger = ScaffoldMessenger.of(context);
+                    final deleted = todo;
+                    await provider.deleteTodo(deleted);
+                    if (!mounted) return;
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text('${deleted.title} deleted'),
+                        action: SnackBarAction(
+                          label: 'UNDO',
+                          onPressed: () {
+                            provider.addTodo(deleted);
+                          },
+                        ),
                       ),
                     );
                   },
+                  child: ListTile(
+                    leading: PriorityIndicator(priority: todo.priority),
+                    title: Text(todo.title),
+                    trailing: Checkbox(
+                      value: todo.isCompleted,
+                      onChanged: (_) {
+                        context.read<TodoProvider>().toggleCompleted(todo);
+                      },
+                    ),
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => EditTodoScreen(todo: todo),
+                        ),
+                      );
+                    },
+                  ),
                 );
               },
             ),
