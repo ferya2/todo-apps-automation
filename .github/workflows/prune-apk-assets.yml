@@ -1,0 +1,75 @@
+name: Prune APK Assets
+
+# Keeps the Releases page tidy: only the N newest releases keep their APK file.
+# Older releases keep their tag, notes and changelog — just the .apk binary goes.
+#
+# Runs automatically after every release (see release.yml), and can be run by
+# hand from the Actions tab. Manual runs default to a dry run, so you can see
+# the list before anything is deleted.
+
+on:
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: "How many of the newest releases keep their APK"
+        default: "2"
+        required: false
+      dry_run:
+        description: "Only list what would be deleted"
+        type: boolean
+        default: true
+  workflow_call:
+    inputs:
+      keep:
+        type: number
+        default: 2
+      dry_run:
+        type: boolean
+        default: false
+
+permissions:
+  contents: write # deleting a release asset is a write to the repo contents
+
+jobs:
+  prune:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Delete APKs from older releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          KEEP: ${{ inputs.keep }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          set -euo pipefail
+
+          # Newest first, by publish date. Drafts are excluded by gh.
+          gh release list --limit 200 --json tagName,publishedAt \
+            --jq 'sort_by(.publishedAt) | reverse | .[].tagName' > tags.txt
+
+          total=$(wc -l < tags.txt)
+          echo "Found $total releases; keeping the APK on the newest $KEEP."
+
+          # Everything past the first $KEEP lines is a candidate.
+          freed=0
+          for tag in $(tail -n +"$((KEEP + 1))" tags.txt); do
+            apks=$(gh release view "$tag" --json assets \
+              --jq '.assets[] | select(.name | endswith(".apk")) | .name')
+            for apk in $apks; do
+              if [ "$DRY_RUN" = "true" ]; then
+                echo "would delete: $tag / $apk"
+              else
+                echo "deleting: $tag / $apk"
+                gh release delete-asset "$tag" "$apk" --yes
+              fi
+              freed=$((freed + 1))
+            done
+          done
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run — $freed APK(s) would be deleted. Re-run with dry_run unchecked to apply."
+          else
+            echo "Deleted $freed APK(s)."
+          fi
