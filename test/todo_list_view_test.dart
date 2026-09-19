@@ -103,4 +103,40 @@ void main() {
     expect(find.byTooltip('Low priority'), findsOneWidget);
     expect(find.byTooltip('High priority'), findsOneWidget);
   });
+
+  testWidgets('shows a category name on each categorized todo', (tester) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+    final dao = TodoDao(helper);
+    final categoryDao = CategoryDao(helper);
+    final provider = TodoProvider(dao, categoryDao: categoryDao);
+    addTearDown(helper.close);
+
+    final workId = await categoryDao.insert(Category(name: 'Work'));
+    await dao.insert(Todo(title: 'Categorized task', categoryId: workId));
+    await dao.insert(Todo(title: 'Uncategorized task'));
+    await provider.loadCategories();
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final categorized = find.widgetWithText(ListTile, 'Categorized task');
+    expect(
+      find.descendant(of: categorized, matching: find.text('Work')),
+      findsOneWidget,
+    );
+    final uncategorized = find.widgetWithText(ListTile, 'Uncategorized task');
+    expect(
+      find.descendant(of: uncategorized, matching: find.text('Work')),
+      findsNothing,
+    );
+  });
 }

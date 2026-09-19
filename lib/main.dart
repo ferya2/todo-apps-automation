@@ -21,7 +21,12 @@ class TodoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => provider ?? TodoProvider(TodoDao(DatabaseHelper.instance)),
+      create: (_) =>
+          provider ??
+          TodoProvider(
+            TodoDao(DatabaseHelper.instance),
+            categoryDao: CategoryDao(DatabaseHelper.instance),
+          ),
       child: MaterialApp(
         title: 'Todo',
         theme: AppTheme.light,

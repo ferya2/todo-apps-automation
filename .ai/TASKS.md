@@ -56,7 +56,7 @@ unchecked** day, completes it, ticks the box, and opens a PR.
   (migration) + a selector in the form + a colored indicator in the list. Test.
 - [x] **Day 18 — Category model + table.** Add `Category` model and `categories`
   table (migration) + `CategoryDao` (insert/getAll). Unit test the DAO.
-- [ ] **Day 19 — Assign category.** Add `categoryId` to todos (migration) + a
+- [x] **Day 19 — Assign category.** Add `categoryId` to todos (migration) + a
   category dropdown in the form. Show the category name on the list item. Test.
 - [ ] **Day 20 — Filter by status.** Add a filter (all / active / completed) in the
   provider + a UI control (tabs or chips). Unit test the filter logic in `utils/`.

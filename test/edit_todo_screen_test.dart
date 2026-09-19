@@ -197,4 +197,53 @@ void main() {
     final saved = await dao.getById(id);
     expect(saved!.priority, TodoPriority.low);
   });
+
+  testWidgets('pre-fills an existing category and saves a change', (
+    tester,
+  ) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+
+    final todoDao = TodoDao(helper);
+    final categoryDao = CategoryDao(helper);
+    final provider = TodoProvider(todoDao, categoryDao: categoryDao);
+
+    addTearDown(helper.close);
+
+    final workId = await categoryDao.insert(Category(name: 'Work'));
+    final personalId = await categoryDao.insert(Category(name: 'Personal'));
+    final id = await todoDao.insert(
+      Todo(title: 'Original title', categoryId: workId),
+    );
+    await provider.loadCategories();
+    await provider.loadTodos();
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider(
+        create: (_) => provider,
+        child: const MaterialApp(home: HomeScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Open the edit screen; the category selector is pre-filled with Work.
+    await tester.tap(find.widgetWithText(ListTile, 'Original title'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditTodoScreen), findsOneWidget);
+    expect(find.text('Work'), findsOneWidget);
+
+    // Change the category to Personal and save.
+    await tester.tap(find.text('Work'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Personal').last);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.byType(EditTodoScreen), findsNothing);
+
+    final saved = await todoDao.getById(id);
+    expect(saved!.categoryId, personalId);
+  });
 }

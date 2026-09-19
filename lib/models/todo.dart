@@ -24,6 +24,7 @@ class Todo {
     this.isCompleted = false,
     this.dueDate,
     this.priority = TodoPriority.medium,
+    this.categoryId,
     DateTime? createdAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
@@ -42,6 +43,9 @@ class Todo {
   /// How urgent the todo is.
   final TodoPriority priority;
 
+  /// The id of the [Category] this todo belongs to, or null when uncategorized.
+  final int? categoryId;
+
   /// When the todo was created.
   final DateTime createdAt;
 
@@ -55,6 +59,7 @@ class Todo {
       'createdAt': createdAt.millisecondsSinceEpoch,
       'dueDate': dueDate?.millisecondsSinceEpoch,
       'priority': priority.name,
+      'categoryId': categoryId,
     };
   }
 
@@ -70,6 +75,7 @@ class Todo {
       priority: map['priority'] is String
           ? TodoPriority.values.byName(map['priority'] as String)
           : TodoPriority.medium,
+      categoryId: map['categoryId'] as int?,
       createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt'] as int),
     );
   }

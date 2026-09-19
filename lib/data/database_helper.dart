@@ -3,9 +3,10 @@ import 'package:sqflite/sqflite.dart';
 
 /// Opens and manages the app's SQLite database.
 ///
-/// Schema version 5. Version 1 created the database with no tables; version 2
+/// Schema version 6. Version 1 created the database with no tables; version 2
 /// adds the `todos` table; version 3 adds the `dueDate` column; version 4 adds
-/// the `priority` column; version 5 adds the `categories` table (see
+/// the `priority` column; version 5 adds the `categories` table; version 6 adds
+/// the `categoryId` column to `todos` (see
 /// [onUpgrade]). All schema changes happen through [DatabaseHelper.onUpgrade]
 /// so existing user data is never dropped.
 ///
@@ -27,7 +28,7 @@ class DatabaseHelper {
 
   /// The schema version. Bump this (and add migration logic in [onUpgrade])
   /// whenever the schema changes.
-  static const int schemaVersion = 5;
+  static const int schemaVersion = 6;
 
   final DatabaseFactory? _databaseFactory;
   final String? _databasePath;
@@ -61,6 +62,7 @@ class DatabaseHelper {
   /// - v3: adds the nullable `dueDate` column to `todos`.
   /// - v4: adds the `priority` column to `todos` (defaults to `medium`).
   /// - v5: adds the `categories` table.
+  /// - v6: adds the nullable `categoryId` column to `todos`.
   ///
   /// Creates the `categories` table (used by Day 18's CategoryDao).
   /// - v5: adds the `categories` table.
@@ -90,6 +92,9 @@ class DatabaseHelper {
           name TEXT NOT NULL
         )
       ''');
+    }
+    if (oldVersion < 6) {
+      await db.execute('ALTER TABLE todos ADD COLUMN categoryId INTEGER');
     }
   }
 
