@@ -32,6 +32,11 @@ void main() {
       expect(todo.priority, TodoPriority.medium);
     });
 
+    test('categoryId defaults to null', () {
+      final todo = Todo(title: 'Write tests');
+      expect(todo.categoryId, isNull);
+    });
+
     test('toMap contains the expected fields', () {
       final createdAt = DateTime(2026, 9, 10, 8, 30);
       final dueDate = DateTime(2026, 9, 20);
@@ -41,6 +46,7 @@ void main() {
         isCompleted: true,
         dueDate: dueDate,
         priority: TodoPriority.high,
+        categoryId: 3,
         createdAt: createdAt,
       );
 
@@ -51,6 +57,7 @@ void main() {
         'createdAt': createdAt.millisecondsSinceEpoch,
         'dueDate': dueDate.millisecondsSinceEpoch,
         'priority': 'high',
+        'categoryId': 3,
       });
     });
 
@@ -78,6 +85,7 @@ void main() {
         'createdAt': createdAt.millisecondsSinceEpoch,
         'dueDate': dueDate.millisecondsSinceEpoch,
         'priority': 'low',
+        'categoryId': 2,
       });
 
       expect(todo.id, 3);
@@ -85,7 +93,19 @@ void main() {
       expect(todo.isCompleted, isTrue);
       expect(todo.dueDate, dueDate);
       expect(todo.priority, TodoPriority.low);
+      expect(todo.categoryId, 2);
       expect(todo.createdAt, createdAt);
+    });
+
+    test('fromMap defaults categoryId to null when the column is missing', () {
+      final todo = Todo.fromMap({
+        'id': 4,
+        'title': 'Walk the dog',
+        'isCompleted': 0,
+        'createdAt': 0,
+      });
+
+      expect(todo.categoryId, isNull);
     });
 
     test('fromMap defaults priority to medium when the column is missing', () {
@@ -118,6 +138,7 @@ void main() {
         isCompleted: true,
         dueDate: DateTime(2026, 9, 30),
         priority: TodoPriority.high,
+        categoryId: 5,
         createdAt: DateTime(2026, 9, 10, 23, 59, 59),
       );
 
@@ -128,6 +149,7 @@ void main() {
       expect(restored.isCompleted, original.isCompleted);
       expect(restored.dueDate, original.dueDate);
       expect(restored.priority, original.priority);
+      expect(restored.categoryId, original.categoryId);
       expect(restored.createdAt, original.createdAt);
     });
   });

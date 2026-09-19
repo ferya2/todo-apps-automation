@@ -2,6 +2,7 @@
 //
 // Concrete widget files are added incrementally per the roadmap.
 
+export 'category_field.dart';
 export 'due_date_field.dart';
 export 'priority_field.dart';
 export 'priority_indicator.dart';

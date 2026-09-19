@@ -37,6 +37,7 @@ void main() {
         isCompleted: false,
         dueDate: DateTime(2026, 9, 25),
         priority: TodoPriority.high,
+        categoryId: 4,
       );
       final id = await dao.insert(todo);
 
@@ -47,6 +48,17 @@ void main() {
       expect(rows.first['isCompleted'], 0);
       expect(rows.first['dueDate'], todo.dueDate!.millisecondsSinceEpoch);
       expect(rows.first['priority'], 'high');
+      expect(rows.first['categoryId'], 4);
+    });
+
+    test('getById returns the inserted todo with its categoryId', () async {
+      final categoryId = 6;
+      final todo = Todo(title: 'Triage inbox', categoryId: categoryId);
+      final id = await dao.insert(todo);
+
+      final saved = await dao.getById(id);
+      expect(saved, isNotNull);
+      expect(saved!.categoryId, categoryId);
     });
 
     test('getById returns the inserted todo', () async {
@@ -91,7 +103,7 @@ void main() {
     });
 
     group('update', () {
-      test('updates the title and isCompleted fields', () async {
+      test('updates the title and the categoryId fields', () async {
         final id = await dao.insert(Todo(title: 'Original'));
         final saved = (await dao.getById(id))!;
 
@@ -101,6 +113,7 @@ void main() {
           isCompleted: true,
           dueDate: DateTime(2026, 10, 1),
           priority: TodoPriority.high,
+          categoryId: 9,
           createdAt: saved.createdAt,
         );
         final changed = await dao.update(updated);
@@ -111,6 +124,7 @@ void main() {
         expect(fetched.isCompleted, true);
         expect(fetched.dueDate, DateTime(2026, 10, 1));
         expect(fetched.priority, TodoPriority.high);
+        expect(fetched.categoryId, 9);
       });
 
       test('returns 0 when updating a non-existent id', () async {

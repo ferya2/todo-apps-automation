@@ -23,15 +23,17 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        context.read<TodoProvider>().loadTodos();
-      }
+      if (!mounted) return;
+      final provider = context.read<TodoProvider>();
+      provider.loadTodos();
+      provider.loadCategories();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final todos = context.watch<TodoProvider>().todos;
+    final provider = context.watch<TodoProvider>();
+    final todos = provider.todos;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Todo')),
@@ -41,9 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: todos.length,
               itemBuilder: (context, index) {
                 final todo = todos[index];
+                final categoryName = provider.categoryNameFor(todo.categoryId);
                 return ListTile(
                   leading: PriorityIndicator(priority: todo.priority),
                   title: Text(todo.title),
+                  subtitle: categoryName == null ? null : Text(categoryName),
                   trailing: Checkbox(
                     value: todo.isCompleted,
                     onChanged: (_) {

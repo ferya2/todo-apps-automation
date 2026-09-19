@@ -197,4 +197,46 @@ void main() {
     expect(saved.title, 'Urgent task');
     expect(saved.priority, TodoPriority.high);
   });
+
+  testWidgets('assigning a category and saving persists it', (tester) async {
+    final helper = DatabaseHelper(
+      databaseFactory: databaseFactoryFfiNoIsolate,
+      databasePath: inMemoryDatabasePath,
+    );
+
+    final todoDao = TodoDao(helper);
+    final categoryDao = CategoryDao(helper);
+    final provider = TodoProvider(todoDao, categoryDao: categoryDao);
+
+    addTearDown(helper.close);
+
+    final categoryId = await categoryDao.insert(Category(name: 'Work'));
+    await provider.loadCategories();
+    await provider.loadTodos();
+
+    await tester.pumpWidget(_appWithProvider(provider, const HomeScreen()));
+    await tester.pumpAndSettle();
+
+    // Open the AddTodoScreen via the home FAB.
+    await tester.tap(find.byIcon(Icons.add));
+    await tester.pumpAndSettle();
+    expect(find.text('Category'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextFormField), 'Pay invoices');
+    await tester.pumpAndSettle();
+
+    // Open the category dropdown and choose Work.
+    await tester.tap(find.text('None'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Work').last);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+    expect(find.byType(AddTodoScreen), findsNothing);
+
+    final saved = (await todoDao.getAll()).single;
+    expect(saved.title, 'Pay invoices');
+    expect(saved.categoryId, categoryId);
+  });
 }

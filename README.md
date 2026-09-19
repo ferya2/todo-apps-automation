@@ -73,3 +73,7 @@ flutter run
 - Day 18: added a `Category` model and `categories` table (schema v5 migration)
   plus a `CategoryDao` (`insert` / `getAll`); unit-tested the model, the DAO,
   and the v4→v5 migration.
+- Day 19: added `categoryId` (schema v6 migration) and a `CategoryField` dropdown
+  in the add/edit forms; assigned categories are persisted, and the category name
+  is shown on each list item. Tested the model + DAO round-trip, the v5→v6
+  migration, the provider category loading, and the dropdown/list-item flows.

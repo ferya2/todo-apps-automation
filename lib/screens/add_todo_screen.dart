@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/providers/todo_provider.dart';
+import 'package:todo_app/widgets/category_field.dart';
 import 'package:todo_app/widgets/due_date_field.dart';
 import 'package:todo_app/widgets/priority_field.dart';
 
@@ -25,6 +26,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
   final TextEditingController _titleController = TextEditingController();
   DateTime? _dueDate;
   TodoPriority _priority = TodoPriority.medium;
+  int? _categoryId;
 
   @override
   void dispose() {
@@ -41,6 +43,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
       title: _titleController.text.trim(),
       dueDate: _dueDate,
       priority: _priority,
+      categoryId: _categoryId,
     );
     context.read<TodoProvider>().addTodo(todo);
     Navigator.of(context).pop();
@@ -48,6 +51,7 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final categories = context.watch<TodoProvider>().categories;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Todo'),
@@ -92,6 +96,13 @@ class _AddTodoScreenState extends State<AddTodoScreen> {
               PriorityField(
                 priority: _priority,
                 onChanged: (priority) => setState(() => _priority = priority),
+              ),
+              const SizedBox(height: 16),
+              CategoryField(
+                categories: categories,
+                categoryId: _categoryId,
+                onChanged: (categoryId) =>
+                    setState(() => _categoryId = categoryId),
               ),
             ],
           ),

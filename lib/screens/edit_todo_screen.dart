@@ -3,13 +3,16 @@ import 'package:provider/provider.dart';
 
 import 'package:todo_app/models/todo.dart';
 import 'package:todo_app/providers/todo_provider.dart';
+import 'package:todo_app/widgets/category_field.dart';
 import 'package:todo_app/widgets/due_date_field.dart';
 import 'package:todo_app/widgets/priority_field.dart';
 
-/// A screen for editing an existing todo's title, due date, and priority.
+/// A screen for editing an existing todo's title, due date, priority, and
+/// category.
 ///
 /// Pre-fills the title field with [Todo.title], the due date field with
-/// [Todo.dueDate], and the priority selector with [Todo.priority]. The title
+/// [Todo.dueDate], the priority selector with [Todo.priority], and the category
+/// selector with [Todo.categoryId]. The title
 /// field is validated: pressing Save with an empty title shows an error and
 /// keeps the screen open. When the title is valid, the todo is persisted via
 /// [TodoProvider] and this screen pops back to the previous route.
@@ -30,6 +33,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
   );
   late DateTime? _dueDate = widget.todo.dueDate;
   late TodoPriority _priority = widget.todo.priority;
+  late int? _categoryId = widget.todo.categoryId;
 
   @override
   void dispose() {
@@ -48,6 +52,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
       isCompleted: widget.todo.isCompleted,
       dueDate: _dueDate,
       priority: _priority,
+      categoryId: _categoryId,
       createdAt: widget.todo.createdAt,
     );
     context.read<TodoProvider>().updateTodo(todo);
@@ -56,6 +61,7 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final categories = context.watch<TodoProvider>().categories;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Todo'),
@@ -100,6 +106,13 @@ class _EditTodoScreenState extends State<EditTodoScreen> {
               PriorityField(
                 priority: _priority,
                 onChanged: (priority) => setState(() => _priority = priority),
+              ),
+              const SizedBox(height: 16),
+              CategoryField(
+                categories: categories,
+                categoryId: _categoryId,
+                onChanged: (categoryId) =>
+                    setState(() => _categoryId = categoryId),
               ),
             ],
           ),

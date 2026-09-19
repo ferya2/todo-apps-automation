@@ -21,7 +21,7 @@ void main() {
         databasePath: inMemoryDatabasePath,
       );
       dao = TodoDao(helper);
-      provider = TodoProvider(dao);
+      provider = TodoProvider(dao, categoryDao: CategoryDao(helper));
     });
 
     tearDown(() async {
@@ -174,6 +174,54 @@ void main() {
       await provider.toggleCompleted(provider.todos.single);
 
       expect(notified, isTrue);
+    });
+
+    group('categories', () {
+      test('starts with an empty category list', () {
+        expect(provider.categories, isEmpty);
+      });
+
+      test('loadCategories loads categories from the DAO', () async {
+        final categoryDao = CategoryDao(helper);
+        await categoryDao.insert(Category(name: 'Work'));
+        await categoryDao.insert(Category(name: 'Personal'));
+
+        await provider.loadCategories();
+
+        expect(provider.categories.map((c) => c.name), ['Work', 'Personal']);
+      });
+
+      test('loadCategories notifies listeners', () async {
+        var notified = false;
+        provider.addListener(() {
+          notified = true;
+        });
+
+        await provider.loadCategories();
+
+        expect(notified, isTrue);
+      });
+
+      test('loadCategories is a no-op when no CategoryDao is wired', () async {
+        final plainProvider = TodoProvider(dao);
+        await plainProvider.loadCategories();
+        expect(plainProvider.categories, isEmpty);
+      });
+
+      test('categoryNameFor resolves a loaded category name', () async {
+        final id = await CategoryDao(helper).insert(Category(name: 'Home'));
+
+        await provider.loadCategories();
+
+        expect(provider.categoryNameFor(id), 'Home');
+      });
+
+      test('categoryNameFor returns null for null or unknown ids', () async {
+        await provider.loadCategories();
+
+        expect(provider.categoryNameFor(null), isNull);
+        expect(provider.categoryNameFor(999), isNull);
+      });
     });
   });
 }
