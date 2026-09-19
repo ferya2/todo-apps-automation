@@ -77,3 +77,14 @@ jobs:
           GIT_COMMITTER_NAME: ferya2
           GIT_COMMITTER_EMAIL: adefery221@gmail.com
         run: npx semantic-release
+
+  # After a release lands, drop the APK from all but the 2 newest releases so
+  # the Releases page does not carry every version's 45 MB binary forever.
+  prune-apks:
+    needs: release
+    permissions:
+      contents: write
+    uses: ./.github/workflows/prune-apk-assets.yml
+    with:
+      keep: 2
+      dry_run: false
