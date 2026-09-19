@@ -73,3 +73,6 @@ flutter run
 - Day 18: added a `Category` model and `categories` table (schema v5 migration)
   plus a `CategoryDao` (`insert` / `getAll`); unit-tested the model, the DAO,
   and the v4→v5 migration.
+- Day 15: added swipe-to-dismiss (end-to-start) to delete a todo from the DB and
+  list, plus an undo snackbar that restores it; tested the provider delete flow
+  and the swipe + undo widget interaction.

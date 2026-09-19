@@ -175,5 +175,30 @@ void main() {
 
       expect(notified, isTrue);
     });
+
+    test('deleteTodo removes the todo from the DB and the list', () async {
+      final id = await dao.insert(Todo(title: 'To be deleted'));
+      await provider.loadTodos();
+      expect(provider.todos, isNotEmpty);
+
+      await provider.deleteTodo(provider.todos.single);
+
+      expect(await dao.getById(id), isNull);
+      expect(provider.todos, isEmpty);
+    });
+
+    test('deleteTodo notifies listeners', () async {
+      await dao.insert(Todo(title: 'Task'));
+      await provider.loadTodos();
+
+      var notified = false;
+      provider.addListener(() {
+        notified = true;
+      });
+
+      await provider.deleteTodo(provider.todos.single);
+
+      expect(notified, isTrue);
+    });
   });
 }
